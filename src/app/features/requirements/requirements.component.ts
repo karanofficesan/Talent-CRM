@@ -16,10 +16,9 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-requirements',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatSnackBarModule],
-  template: `
+    selector: 'app-requirements',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatSnackBarModule],
+    template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
     <div><h1>Client Requirements</h1><p>{{ requirements.length }} requirements · {{ activeCount }} active</p></div>
@@ -113,7 +112,7 @@ const STATUS_COLORS: Record<string, string> = {
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .status-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
     .tab-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-full); padding:8px 16px; color:var(--text-secondary); font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s; font-family:inherit;
       &.active { background:rgba(108,99,255,0.2); border-color:var(--color-primary); color:var(--color-primary); }

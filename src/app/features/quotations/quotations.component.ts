@@ -17,10 +17,9 @@ import { Quotation, Booking, Client, Model } from '../../core/models';
 const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'badge-info','Approved':'badge-success','Not Approved':'badge-danger','Closed':'badge-primary' };
 
 @Component({
-  selector: 'app-quotations',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule, RouterLink, MatMenuModule, MatDividerModule],
-  template: `
+    selector: 'app-quotations',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule, RouterLink, MatMenuModule, MatDividerModule],
+    template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
     <div><h1>Quotation Management</h1><p>{{ quotations.length }} quotations total</p></div>
@@ -282,7 +281,7 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
     </div>
   </div>
   `,
-  styles: [`
+    styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .q-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }

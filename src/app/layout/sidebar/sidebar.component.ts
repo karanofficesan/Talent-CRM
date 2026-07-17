@@ -10,10 +10,9 @@ interface NavItem {
 }
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule, MatRippleModule],
-  template: `
+    selector: 'app-sidebar',
+    imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule, MatRippleModule],
+    template: `
     <aside class="sidebar" [class.collapsed]="collapsed">
       <!-- Brand -->
       <div class="brand">
@@ -56,7 +55,7 @@ interface NavItem {
       </div>
     </aside>
   `,
-  styles: [`
+    styles: [`
     .sidebar {
       width: var(--sidebar-width);
       height: 100vh;

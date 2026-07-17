@@ -11,10 +11,9 @@ import { MockDataService } from '../../core/services/mock-data.service';
 import { Payment, Invoice } from '../../core/models';
 
 @Component({
-  selector: 'app-payments',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatSnackBarModule],
-  template: `
+    selector: 'app-payments',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatSnackBarModule],
+    template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
     <div><h1>Payments</h1><p>{{ payments.length }} transactions recorded</p></div>
@@ -143,7 +142,7 @@ import { Payment, Invoice } from '../../core/models';
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .p-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }
       td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary); }

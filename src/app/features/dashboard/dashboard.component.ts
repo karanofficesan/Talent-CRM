@@ -9,10 +9,9 @@ import { MockDataService } from '../../core/services/mock-data.service';
 import { DashboardStats } from '../../core/models';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, CurrencyPipe, RouterLink, MatIconModule, MatButtonModule, MatProgressBarModule, MatTooltipModule],
-  template: `
+    selector: 'app-dashboard',
+    imports: [CommonModule, CurrencyPipe, RouterLink, MatIconModule, MatButtonModule, MatProgressBarModule, MatTooltipModule],
+    template: `
     <div class="page-container">
       <!-- Header -->
       <div class="page-header">
@@ -206,7 +205,7 @@ import { DashboardStats } from '../../core/models';
     <!-- Backdrop -->
     <div class="fab-backdrop" *ngIf="fabOpen" (click)="fabOpen=false"></div>
   `,
-  styles: [`
+    styles: [`
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);

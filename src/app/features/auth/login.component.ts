@@ -10,10 +10,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
-  template: `
+    selector: 'app-login',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
+    template: `
 <div class="login-wrapper">
   <div class="login-card">
     <div class="login-header">
@@ -54,7 +53,7 @@ import { AuthService } from '../../core/services/auth.service';
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .login-wrapper {
       display: flex; justify-content: center; align-items: center;
       min-height: 100vh;

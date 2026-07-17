@@ -7,10 +7,9 @@ import { MockDataService } from '../../core/services/mock-data.service';
 import { Booking } from '../../core/models';
 
 @Component({
-  selector: 'app-calendar',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
-  template: `
+    selector: 'app-calendar',
+    imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+    template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
     <div><h1>Calendar</h1><p>Centralized shoot schedule & availability</p></div>
@@ -85,7 +84,7 @@ import { Booking } from '../../core/models';
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .view-toggle { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;
       button { background:none; border:none; color:var(--text-secondary); padding:8px 16px; cursor:pointer; font-size:13px; font-weight:500; font-family:inherit; transition:all 0.2s;
         &.active { background:rgba(108,99,255,0.2); color:var(--color-primary); }

@@ -17,16 +17,15 @@ import { Model, MODEL_CATEGORIES, HAIR_COLORS, EYE_COLORS, SKIN_TONES, NATIONALI
 import { ModelFormDialogComponent } from './model-form-dialog.component';
 
 @Component({
-  selector: 'app-models-mgmt',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
-    MatIconModule, MatButtonModule, MatDialogModule,
-    MatChipsModule, MatMenuModule, MatSelectModule,
-    MatFormFieldModule, MatInputModule, MatTabsModule,
-    MatTooltipModule, MatSnackBarModule
-  ],
-  template: `
+    selector: 'app-models-mgmt',
+    imports: [
+        CommonModule, FormsModule, ReactiveFormsModule,
+        MatIconModule, MatButtonModule, MatDialogModule,
+        MatChipsModule, MatMenuModule, MatSelectModule,
+        MatFormFieldModule, MatInputModule, MatTabsModule,
+        MatTooltipModule, MatSnackBarModule
+    ],
+    template: `
 <div class="page-container">
   <!-- Header -->
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
@@ -135,7 +134,7 @@ import { ModelFormDialogComponent } from './model-form-dialog.component';
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .filter-bar {
       display:flex; gap:12px; align-items:center; flex-wrap:wrap;
       margin-bottom:24px;

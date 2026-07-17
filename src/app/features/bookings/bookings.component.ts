@@ -10,10 +10,9 @@ import { Booking, Invoice } from '../../core/models';
 const B_STATUS_COLOR: Record<string,string> = { 'Confirmed':'badge-success','In Progress':'badge-info','Completed':'badge-primary','Cancelled':'badge-danger' };
 
 @Component({
-  selector: 'app-bookings',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, MatSnackBarModule],
-  template: `
+    selector: 'app-bookings',
+    imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, MatSnackBarModule],
+    template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
     <div><h1>Booking Management</h1><p>{{ bookings.length }} bookings · {{ upcoming }} upcoming</p></div>
@@ -108,7 +107,7 @@ const B_STATUS_COLOR: Record<string,string> = { 'Confirmed':'badge-success','In 
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .b-table { width:100%; border-collapse:collapse;
       th { padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.08); }

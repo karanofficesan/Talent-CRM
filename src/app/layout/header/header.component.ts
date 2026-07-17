@@ -13,10 +13,9 @@ import { Notification } from '../../core/models';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, MatMenuModule, MatBadgeModule, MatTooltipModule, MatDividerModule, FormsModule],
-  template: `
+    selector: 'app-header',
+    imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, MatMenuModule, MatBadgeModule, MatTooltipModule, MatDividerModule, FormsModule],
+    template: `
     <header class="header">
       <!-- Left -->
       <div class="header-left">
@@ -104,7 +103,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
     </header>
   `,
-  styles: [`
+    styles: [`
     .header {
       height: var(--header-height);
       background: var(--bg-surface);

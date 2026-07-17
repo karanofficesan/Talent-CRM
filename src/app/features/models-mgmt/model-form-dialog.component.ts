@@ -14,15 +14,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Model, MODEL_CATEGORIES, HAIR_COLORS, EYE_COLORS, SKIN_TONES, NATIONALITIES } from '../../core/models';
 
 @Component({
-  selector: 'app-model-form-dialog',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
-    MatDialogModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatChipsModule, MatTabsModule, MatCheckboxModule, MatProgressBarModule
-  ],
-  template: `
+    selector: 'app-model-form-dialog',
+    imports: [
+        CommonModule, FormsModule, ReactiveFormsModule,
+        MatDialogModule, MatButtonModule, MatIconModule,
+        MatFormFieldModule, MatInputModule, MatSelectModule,
+        MatChipsModule, MatTabsModule, MatCheckboxModule, MatProgressBarModule
+    ],
+    template: `
 <div class="dialog-wrapper">
   <div class="dialog-head">
     <div style="flex:1">
@@ -386,7 +385,7 @@ import { Model, MODEL_CATEGORIES, HAIR_COLORS, EYE_COLORS, SKIN_TONES, NATIONALI
   </div>
 </div>
   `,
-  styles: [`
+    styles: [`
     .dialog-wrapper { min-width:860px; background: var(--bg-surface); }
     .dialog-head { display:flex; justify-content:space-between; align-items:flex-start; padding:24px 28px 0; h2{font-size:22px;font-weight:800;color:var(--text-primary);margin:0} }
     .dialog-tabs { margin:16px 0; }
