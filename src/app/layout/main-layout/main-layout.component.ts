@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -18,6 +18,7 @@ import { HeaderComponent } from '../header/header.component';
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .layout-wrapper { display: flex; height: 100vh; overflow: hidden; }
     .content-area  { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }

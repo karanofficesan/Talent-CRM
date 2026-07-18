@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -160,6 +160,7 @@ import { ModelFormDialogComponent } from './model-form-dialog.component';
   }
 </div>
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .filter-bar {
       display:flex; gap:12px; align-items:center; flex-wrap:wrap;

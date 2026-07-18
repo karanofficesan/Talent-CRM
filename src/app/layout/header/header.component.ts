@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -109,6 +109,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
     </header>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .header {
       height: var(--header-height);

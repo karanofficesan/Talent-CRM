@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -125,6 +125,7 @@ const B_STATUS_COLOR: Record<string,string> = { 'Confirmed':'badge-success','In 
   }
 </div>
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .b-table { width:100%; border-collapse:collapse;

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -413,6 +413,7 @@ import { Model, MODEL_CATEGORIES, HAIR_COLORS, EYE_COLORS, SKIN_TONES, NATIONALI
   }
 </div>
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .dialog-wrapper { min-width:860px; background: var(--bg-surface); }
     .dialog-head { display:flex; justify-content:space-between; align-items:flex-start; padding:24px 28px 0; h2{font-size:22px;font-weight:800;color:var(--text-primary);margin:0} }

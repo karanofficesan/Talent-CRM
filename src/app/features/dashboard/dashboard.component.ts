@@ -1,5 +1,5 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,7 @@ import { DashboardStats } from '../../core/models';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [CommonModule, CurrencyPipe, RouterLink, MatIconModule, MatButtonModule, MatProgressBarModule, MatTooltipModule],
+    imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, MatProgressBarModule, MatTooltipModule],
     template: `
     <div class="page-container">
       <!-- Header -->
@@ -219,6 +219,7 @@ import { DashboardStats } from '../../core/models';
       <div class="fab-backdrop" (click)="fabOpen=false"></div>
     }
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .stats-grid {
       display: grid;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { RouterLink } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MockDataService } from '../../core/services/mock-data.service';
@@ -18,7 +17,7 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
 
 @Component({
     selector: 'app-quotations',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule, RouterLink, MatMenuModule, MatDividerModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule, MatMenuModule, MatDividerModule],
     template: `
 <div class="page-container">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
@@ -312,6 +311,7 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
   </div>
 }
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .q-table { width:100%; border-collapse:collapse;

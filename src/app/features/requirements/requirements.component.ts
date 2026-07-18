@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -127,6 +127,7 @@ const STATUS_COLORS: Record<string, string> = {
   }
 </div>
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .status-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
     .tab-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-full); padding:8px 16px; color:var(--text-secondary); font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s; font-family:inherit;

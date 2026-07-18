@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -69,6 +69,7 @@ interface NavItem {
       }
     </aside>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .sidebar {
       width: var(--sidebar-width);

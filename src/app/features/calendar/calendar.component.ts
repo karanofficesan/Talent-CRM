@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -98,6 +98,7 @@ import { Booking } from '../../core/models';
   </div>
 </div>
 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .view-toggle { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;
       button { background:none; border:none; color:var(--text-secondary); padding:8px 16px; cursor:pointer; font-size:13px; font-weight:500; font-family:inherit; transition:all 0.2s;
