@@ -20,64 +20,66 @@ import { DashboardStats } from '../../core/models';
           <p>Here's what's happening with your agency today.</p>
         </div>
       </div>
-
+    
       <!-- Stats Grid -->
-      <div class="stats-grid" *ngIf="stats">
-        <div class="stat-card purple" routerLink="/models">
-          <div class="stat-icon"><mat-icon>people</mat-icon></div>
-          <div class="stat-value">{{ stats.totalModels }}</div>
-          <div class="stat-label">Total Models</div>
-          <span class="stat-change positive">+2 this month</span>
+      @if (stats) {
+        <div class="stats-grid">
+          <div class="stat-card purple" routerLink="/models">
+            <div class="stat-icon"><mat-icon>people</mat-icon></div>
+            <div class="stat-value">{{ stats.totalModels }}</div>
+            <div class="stat-label">Total Models</div>
+            <span class="stat-change positive">+2 this month</span>
+          </div>
+          <div class="stat-card green" routerLink="/models">
+            <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-value">{{ stats.activeModels }}</div>
+            <div class="stat-label">Active Models</div>
+          </div>
+          <div class="stat-card blue" routerLink="/models">
+            <div class="stat-icon"><mat-icon>event_available</mat-icon></div>
+            <div class="stat-value">{{ stats.availableModels }}</div>
+            <div class="stat-label">Available Today</div>
+          </div>
+          <div class="stat-card pink" routerLink="/bookings">
+            <div class="stat-icon"><mat-icon>camera</mat-icon></div>
+            <div class="stat-value">{{ stats.bookedModels }}</div>
+            <div class="stat-label">Booked Models</div>
+          </div>
+          <div class="stat-card orange" routerLink="/bookings">
+            <div class="stat-icon"><mat-icon>upcoming</mat-icon></div>
+            <div class="stat-value">{{ stats.upcomingShoots }}</div>
+            <div class="stat-label">Upcoming Shoots</div>
+          </div>
+          <div class="stat-card blue" routerLink="/quotations">
+            <div class="stat-icon"><mat-icon>pending_actions</mat-icon></div>
+            <div class="stat-value">{{ stats.pendingQuotations }}</div>
+            <div class="stat-label">Pending Quotations</div>
+            <span class="stat-change negative">Action needed</span>
+          </div>
+          <div class="stat-card green" routerLink="/quotations">
+            <div class="stat-icon"><mat-icon>task_alt</mat-icon></div>
+            <div class="stat-value">{{ stats.approvedQuotations }}</div>
+            <div class="stat-label">Approved Quotations</div>
+          </div>
+          <div class="stat-card red" routerLink="/invoices">
+            <div class="stat-icon"><mat-icon>receipt_long</mat-icon></div>
+            <div class="stat-value">{{ stats.pendingInvoices }}</div>
+            <div class="stat-label">Pending Invoices</div>
+          </div>
+          <div class="stat-card orange" routerLink="/payments">
+            <div class="stat-icon"><mat-icon>payments</mat-icon></div>
+            <div class="stat-value">₹{{ (stats.pendingPayments/1000).toFixed(0) }}K</div>
+            <div class="stat-label">Pending Payments</div>
+          </div>
+          <div class="stat-card purple revenue-card" routerLink="/reports">
+            <div class="stat-icon"><mat-icon>trending_up</mat-icon></div>
+            <div class="stat-value">₹{{ (stats.monthlyRevenue/1000).toFixed(0) }}K</div>
+            <div class="stat-label">Monthly Revenue</div>
+            <span class="stat-change positive">+{{ stats.monthlyRevenueChange }}%</span>
+          </div>
         </div>
-        <div class="stat-card green" routerLink="/models">
-          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
-          <div class="stat-value">{{ stats.activeModels }}</div>
-          <div class="stat-label">Active Models</div>
-        </div>
-        <div class="stat-card blue" routerLink="/models">
-          <div class="stat-icon"><mat-icon>event_available</mat-icon></div>
-          <div class="stat-value">{{ stats.availableModels }}</div>
-          <div class="stat-label">Available Today</div>
-        </div>
-        <div class="stat-card pink" routerLink="/bookings">
-          <div class="stat-icon"><mat-icon>camera</mat-icon></div>
-          <div class="stat-value">{{ stats.bookedModels }}</div>
-          <div class="stat-label">Booked Models</div>
-        </div>
-        <div class="stat-card orange" routerLink="/bookings">
-          <div class="stat-icon"><mat-icon>upcoming</mat-icon></div>
-          <div class="stat-value">{{ stats.upcomingShoots }}</div>
-          <div class="stat-label">Upcoming Shoots</div>
-        </div>
-        <div class="stat-card blue" routerLink="/quotations">
-          <div class="stat-icon"><mat-icon>pending_actions</mat-icon></div>
-          <div class="stat-value">{{ stats.pendingQuotations }}</div>
-          <div class="stat-label">Pending Quotations</div>
-          <span class="stat-change negative">Action needed</span>
-        </div>
-        <div class="stat-card green" routerLink="/quotations">
-          <div class="stat-icon"><mat-icon>task_alt</mat-icon></div>
-          <div class="stat-value">{{ stats.approvedQuotations }}</div>
-          <div class="stat-label">Approved Quotations</div>
-        </div>
-        <div class="stat-card red" routerLink="/invoices">
-          <div class="stat-icon"><mat-icon>receipt_long</mat-icon></div>
-          <div class="stat-value">{{ stats.pendingInvoices }}</div>
-          <div class="stat-label">Pending Invoices</div>
-        </div>
-        <div class="stat-card orange" routerLink="/payments">
-          <div class="stat-icon"><mat-icon>payments</mat-icon></div>
-          <div class="stat-value">₹{{ (stats.pendingPayments/1000).toFixed(0) }}K</div>
-          <div class="stat-label">Pending Payments</div>
-        </div>
-        <div class="stat-card purple revenue-card" routerLink="/reports">
-          <div class="stat-icon"><mat-icon>trending_up</mat-icon></div>
-          <div class="stat-value">₹{{ (stats.monthlyRevenue/1000).toFixed(0) }}K</div>
-          <div class="stat-label">Monthly Revenue</div>
-          <span class="stat-change positive">+{{ stats.monthlyRevenueChange }}%</span>
-        </div>
-      </div>
-
+      }
+    
       <!-- Bottom Row -->
       <div class="bottom-grid">
         <!-- Recent Activities -->
@@ -87,23 +89,25 @@ import { DashboardStats } from '../../core/models';
             <button mat-button color="primary" routerLink="/reports">View All</button>
           </div>
           <div class="activity-list">
-            <div *ngFor="let act of stats?.recentActivities" class="activity-item">
-              <div class="activity-icon" [ngClass]="act.color">
-                <mat-icon>{{ act.icon }}</mat-icon>
-              </div>
-              <div class="activity-body">
-                <div class="activity-action">{{ act.action }}</div>
-                <div class="activity-details">{{ act.details }}</div>
-                <div class="activity-meta">
-                  <span>{{ act.userName }}</span>
-                  <span class="dot">·</span>
-                  <span>{{ act.timestamp }}</span>
+            @for (act of stats?.recentActivities; track act) {
+              <div class="activity-item">
+                <div class="activity-icon" [ngClass]="act.color">
+                  <mat-icon>{{ act.icon }}</mat-icon>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-action">{{ act.action }}</div>
+                  <div class="activity-details">{{ act.details }}</div>
+                  <div class="activity-meta">
+                    <span>{{ act.userName }}</span>
+                    <span class="dot">·</span>
+                    <span>{{ act.timestamp }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            }
           </div>
         </div>
-
+    
         <!-- Upcoming Shoots -->
         <div class="shoots-panel">
           <div class="panel-header">
@@ -119,52 +123,60 @@ import { DashboardStats } from '../../core/models';
             </div>
           </div>
           <div class="shoots-list">
-            <div *ngFor="let shoot of filteredShoots" class="shoot-item">
-              <div class="shoot-date-badge" [ngClass]="shoot.urgency">
-                <div class="shoot-day">{{ shoot.day }}</div>
-                <div class="shoot-month">{{ shoot.month }}</div>
-              </div>
-              <div class="shoot-info">
-                <div class="shoot-title">{{ shoot.title }}</div>
-                <div class="shoot-meta">
-                  <mat-icon style="font-size:13px;width:13px;height:13px">location_on</mat-icon>
-                  {{ shoot.location }}
-                  <span class="dot">·</span>
-                  <mat-icon style="font-size:13px;width:13px;height:13px">schedule</mat-icon>
-                  {{ shoot.time }}
+            @for (shoot of filteredShoots; track shoot) {
+              <div class="shoot-item">
+                <div class="shoot-date-badge" [ngClass]="shoot.urgency">
+                  <div class="shoot-day">{{ shoot.day }}</div>
+                  <div class="shoot-month">{{ shoot.month }}</div>
                 </div>
-                <div class="shoot-models">
-                  <span *ngFor="let m of shoot.models" class="model-chip">{{ m }}</span>
+                <div class="shoot-info">
+                  <div class="shoot-title">{{ shoot.title }}</div>
+                  <div class="shoot-meta">
+                    <mat-icon style="font-size:13px;width:13px;height:13px">location_on</mat-icon>
+                    {{ shoot.location }}
+                    <span class="dot">·</span>
+                    <mat-icon style="font-size:13px;width:13px;height:13px">schedule</mat-icon>
+                    {{ shoot.time }}
+                  </div>
+                  <div class="shoot-models">
+                    @for (m of shoot.models; track m) {
+                      <span class="model-chip">{{ m }}</span>
+                    }
+                  </div>
                 </div>
+                <div class="shoot-status" [ngClass]="shoot.urgency">{{ shoot.status }}</div>
               </div>
-              <div class="shoot-status" [ngClass]="shoot.urgency">{{ shoot.status }}</div>
-            </div>
-            <div *ngIf="filteredShoots.length === 0" class="shoots-empty">
-              <mat-icon>event_busy</mat-icon>
-              <p>No shoots found</p>
-            </div>
+            }
+            @if (filteredShoots.length === 0) {
+              <div class="shoots-empty">
+                <mat-icon>event_busy</mat-icon>
+                <p>No shoots found</p>
+              </div>
+            }
           </div>
-
+    
           <!-- Pipeline -->
           <div style="border-top:1px solid var(--border);margin-top:4px">
             <div class="panel-header"><h3>Workflow Pipeline</h3></div>
             <div class="pipeline">
-              <div class="pipeline-item" *ngFor="let step of pipeline">
-                <div class="pipeline-icon" [ngClass]="step.color">
-                  <mat-icon>{{ step.icon }}</mat-icon>
+              @for (step of pipeline; track step) {
+                <div class="pipeline-item">
+                  <div class="pipeline-icon" [ngClass]="step.color">
+                    <mat-icon>{{ step.icon }}</mat-icon>
+                  </div>
+                  <div class="pipeline-info">
+                    <div class="pipeline-label">{{ step.label }}</div>
+                    <div class="pipeline-count">{{ step.count }}</div>
+                  </div>
+                  <mat-progress-bar mode="determinate" [value]="step.pct" [color]="step.matColor" class="pipeline-bar"></mat-progress-bar>
                 </div>
-                <div class="pipeline-info">
-                  <div class="pipeline-label">{{ step.label }}</div>
-                  <div class="pipeline-count">{{ step.count }}</div>
-                </div>
-                <mat-progress-bar mode="determinate" [value]="step.pct" [color]="step.matColor" class="pipeline-bar"></mat-progress-bar>
-              </div>
+              }
             </div>
           </div>
         </div>
       </div>
     </div>
-
+    
     <!-- ─── Floating Quick Action Button ─────────────────────────── -->
     <div class="fab-container" [class.open]="fabOpen">
       <!-- Action Items (shown when open) -->
@@ -194,17 +206,19 @@ import { DashboardStats } from '../../core/models';
           <span class="fab-action-label">Invoice</span>
         </a>
       </div>
-
+    
       <!-- Main FAB -->
       <button class="fab-main" (click)="fabOpen=!fabOpen" matTooltip="Quick Actions" matTooltipPosition="left">
         <mat-icon class="fab-icon-add">add</mat-icon>
         <mat-icon class="fab-icon-close">close</mat-icon>
       </button>
     </div>
-
+    
     <!-- Backdrop -->
-    <div class="fab-backdrop" *ngIf="fabOpen" (click)="fabOpen=false"></div>
-  `,
+    @if (fabOpen) {
+      <div class="fab-backdrop" (click)="fabOpen=false"></div>
+    }
+    `,
     styles: [`
     .stats-grid {
       display: grid;

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-header',
-    imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, MatMenuModule, MatBadgeModule, MatTooltipModule, MatDividerModule, FormsModule],
+    imports: [RouterLink, MatIconModule, MatButtonModule, MatMenuModule, MatBadgeModule, MatTooltipModule, MatDividerModule, FormsModule],
     template: `
     <header class="header">
       <!-- Left -->
@@ -28,7 +28,7 @@ import { AuthService } from '../../core/services/auth.service';
           <span class="search-shortcut">⌘K</span>
         </div>
       </div>
-
+    
       <!-- Right -->
       <div class="header-right">
         <!-- Notifications -->
@@ -41,44 +41,50 @@ import { AuthService } from '../../core/services/auth.service';
             <button mat-button color="primary" (click)="markAllRead()">Mark all read</button>
           </div>
           <div class="notif-list">
-            <div *ngFor="let n of notifications" class="notif-item" [class.unread]="!n.isRead" (click)="readNotif(n)">
-              <div class="notif-dot" [class]="n.type"></div>
-              <div class="notif-content">
-                <div class="notif-title">{{ n.title }}</div>
-                <div class="notif-msg">{{ n.message }}</div>
-                <div class="notif-time">{{ n.timestamp }}</div>
+            @for (n of notifications; track n) {
+              <div class="notif-item" [class.unread]="!n.isRead" (click)="readNotif(n)">
+                <div class="notif-dot" [class]="n.type"></div>
+                <div class="notif-content">
+                  <div class="notif-title">{{ n.title }}</div>
+                  <div class="notif-msg">{{ n.message }}</div>
+                  <div class="notif-time">{{ n.timestamp }}</div>
+                </div>
               </div>
-            </div>
+            }
           </div>
         </mat-menu>
-
+    
         <!-- Theme Picker -->
         <button class="icon-btn" [matMenuTriggerFor]="themeMenu" matTooltip="Change Theme">
           <mat-icon>palette</mat-icon>
         </button>
         <mat-menu #themeMenu="matMenu">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px"
-               (click)="$event.stopPropagation()">
+            (click)="$event.stopPropagation()">
             Choose Theme
           </div>
           <div (click)="$event.stopPropagation()"
-               style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:16px;width:288px">
-            <div *ngFor="let t of themes"
-                 (click)="applyTheme(t.key)"
-                 [style.background]="activeTheme===t.key ? 'rgba(0,0,0,0.06)' : 'transparent'"
+            style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:16px;width:288px">
+            @for (t of themes; track t) {
+              <div
+                (click)="applyTheme(t.key)"
+                [style.background]="activeTheme===t.key ? 'rgba(0,0,0,0.06)' : 'transparent'"
                  style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
                         padding:10px 6px;border-radius:12px;transition:background 0.18s">
-              <div [style.background]="t.gradient"
-                   [style.box-shadow]="activeTheme===t.key ? '0 0 0 3px white, 0 0 0 5px '+t.borderColor : '0 2px 8px rgba(0,0,0,0.18)'"
+                <div [style.background]="t.gradient"
+                  [style.box-shadow]="activeTheme===t.key ? '0 0 0 3px white, 0 0 0 5px '+t.borderColor : '0 2px 8px rgba(0,0,0,0.18)'"
                    style="width:36px;height:36px;border-radius:50%;
                           display:flex;align-items:center;justify-content:center;transition:box-shadow 0.2s">
-                <mat-icon *ngIf="activeTheme===t.key" style="font-size:16px;width:16px;height:16px;color:white">check</mat-icon>
+                  @if (activeTheme===t.key) {
+                    <mat-icon style="font-size:16px;width:16px;height:16px;color:white">check</mat-icon>
+                  }
+                </div>
+                <span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;line-height:1.3">{{ t.label }}</span>
               </div>
-              <span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;line-height:1.3">{{ t.label }}</span>
-            </div>
+            }
           </div>
         </mat-menu>
-
+    
         <!-- User Menu -->
         <div class="user-chip" [matMenuTriggerFor]="userMenu">
           <div class="user-avatar-sm">RA</div>
@@ -102,7 +108,7 @@ import { AuthService } from '../../core/services/auth.service';
         </mat-menu>
       </div>
     </header>
-  `,
+    `,
     styles: [`
     .header {
       height: var(--header-height);

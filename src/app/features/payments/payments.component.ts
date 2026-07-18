@@ -35,113 +35,114 @@ import { Payment, Invoice } from '../../core/models';
         <th>Status</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let p of filtered">
-          <td style="font-weight:500">{{ p.paymentDate }}</td>
-          <td><div style="font-weight:600;font-size:13px">{{ p.clientName }}</div></td>
-          <td><span style="font-size:12px;color:var(--color-primary);font-weight:600">{{ p.invoiceNumber }}</span></td>
-          <td style="font-weight:700;color:var(--color-success)">₹{{ p.amount.toLocaleString() }}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:6px">
-              <mat-icon style="font-size:16px;color:var(--text-muted)">
-                {{ p.paymentMethod==='Bank Transfer' ? 'account_balance' : (p.paymentMethod==='Cash' ? 'payments' : 'credit_card') }}
-              </mat-icon>
-              {{ p.paymentMethod }}
-            </div>
-          </td>
-          <td style="font-size:12px;color:var(--text-muted)">{{ p.transactionId || '-' }}</td>
-          <td>
-            <span class="badge" [ngClass]="p.status==='Received'?'badge-success':(p.status==='Failed'?'badge-danger':'badge-warning')">
-              {{ p.status }}
-            </span>
-          </td>
-          <td>
-            <button mat-icon-button (click)="openForm(p)"><mat-icon style="font-size:18px">edit</mat-icon></button>
-          </td>
-        </tr>
+        @for (p of filtered; track p) {
+          <tr>
+            <td style="font-weight:500">{{ p.paymentDate }}</td>
+            <td><div style="font-weight:600;font-size:13px">{{ p.clientName }}</div></td>
+            <td><span style="font-size:12px;color:var(--color-primary);font-weight:600">{{ p.invoiceNumber }}</span></td>
+            <td style="font-weight:700;color:var(--color-success)">₹{{ p.amount.toLocaleString() }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <mat-icon style="font-size:16px;color:var(--text-muted)">
+                  {{ p.paymentMethod==='Bank Transfer' ? 'account_balance' : (p.paymentMethod==='Cash' ? 'payments' : 'credit_card') }}
+                </mat-icon>
+                {{ p.paymentMethod }}
+              </div>
+            </td>
+            <td style="font-size:12px;color:var(--text-muted)">{{ p.transactionId || '-' }}</td>
+            <td>
+              <span class="badge" [ngClass]="p.status==='Received'?'badge-success':(p.status==='Failed'?'badge-danger':'badge-warning')">
+                {{ p.status }}
+              </span>
+            </td>
+            <td>
+              <button mat-icon-button (click)="openForm(p)"><mat-icon style="font-size:18px">edit</mat-icon></button>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:40px;color:var(--text-muted)">
-      <mat-icon style="font-size:48px;opacity:0.3">account_balance_wallet</mat-icon>
-      <p style="margin-top:12px">No payments found</p>
-    </div>
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <mat-icon style="font-size:48px;opacity:0.3">account_balance_wallet</mat-icon>
+        <p style="margin-top:12px">No payments found</p>
+      </div>
+    }
   </div>
 
   <!-- Inline Dialog -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
-    <div class="inline-dialog" (click)="$event.stopPropagation()">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Payment' : 'Record Payment' }}</h3>
-        <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+  @if (showForm) {
+    <div class="dialog-overlay" (click)="showForm=false">
+      <div class="inline-dialog" (click)="$event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Payment' : 'Record Payment' }}</h3>
+          <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
+          <div class="form-grid2">
+            <mat-form-field appearance="outline" style="grid-column:1/-1">
+              <mat-label>Select Pending Invoice</mat-label>
+              <mat-select formControlName="invoiceId" (selectionChange)="onInvoiceChange($event.value)">
+                @for (inv of pendingInvoices; track inv) {
+                  <mat-option [value]="inv.id">
+                    {{ inv.invoiceNumber }} - {{ inv.clientName }} (Due: ₹{{ (inv.totalAmount - inv.paidAmount).toLocaleString() }})
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Amount Received (₹)</mat-label>
+              <input matInput type="number" formControlName="amount">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Payment Date</mat-label>
+              <input matInput type="date" formControlName="paymentDate">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Payment Method</mat-label>
+              <mat-select formControlName="paymentMethod" (selectionChange)="onMethodChange($event.value)">
+                <mat-option value="Razorpay">Razorpay</mat-option>
+                <mat-option value="Stripe">Stripe</mat-option>
+                <mat-option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</mat-option>
+                <mat-option value="UPI">UPI</mat-option>
+                <mat-option value="Cheque">Cheque</mat-option>
+                <mat-option value="Cash">Cash</mat-option>
+                <mat-option value="Other">Other (Specify)</mat-option>
+              </mat-select>
+            </mat-form-field>
+            @if (showCustomMethod) {
+              <mat-form-field appearance="outline">
+                <mat-label>Specify Payment Method</mat-label>
+                <input matInput formControlName="customMethod" placeholder="e.g. PayPal">
+              </mat-form-field>
+            }
+            <mat-form-field appearance="outline" [style.grid-column]="showCustomMethod ? '1/-1' : 'auto'">
+              <mat-label>Transaction / Reference ID</mat-label>
+              <input matInput formControlName="transactionId">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="Received">Received</mat-option>
+                <mat-option value="Pending">Pending</mat-option>
+                <mat-option value="Failed">Failed</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" style="grid-column:1/-1">
+              <mat-label>Notes</mat-label>
+              <textarea matInput formControlName="notes" rows="2"></textarea>
+            </mat-form-field>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+            <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Payment</button>
+          </div>
+        </form>
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
-        <div class="form-grid2">
-          
-          <mat-form-field appearance="outline" style="grid-column:1/-1">
-            <mat-label>Select Pending Invoice</mat-label>
-            <mat-select formControlName="invoiceId" (selectionChange)="onInvoiceChange($event.value)">
-              <mat-option *ngFor="let inv of pendingInvoices" [value]="inv.id">
-                {{ inv.invoiceNumber }} - {{ inv.clientName }} (Due: ₹{{ (inv.totalAmount - inv.paidAmount).toLocaleString() }})
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Amount Received (₹)</mat-label>
-            <input matInput type="number" formControlName="amount">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Payment Date</mat-label>
-            <input matInput type="date" formControlName="paymentDate">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Payment Method</mat-label>
-            <mat-select formControlName="paymentMethod" (selectionChange)="onMethodChange($event.value)">
-              <mat-option value="Razorpay">Razorpay</mat-option>
-              <mat-option value="Stripe">Stripe</mat-option>
-              <mat-option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</mat-option>
-              <mat-option value="UPI">UPI</mat-option>
-              <mat-option value="Cheque">Cheque</mat-option>
-              <mat-option value="Cash">Cash</mat-option>
-              <mat-option value="Other">Other (Specify)</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" *ngIf="showCustomMethod">
-            <mat-label>Specify Payment Method</mat-label>
-            <input matInput formControlName="customMethod" placeholder="e.g. PayPal">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" [style.grid-column]="showCustomMethod ? '1/-1' : 'auto'">
-            <mat-label>Transaction / Reference ID</mat-label>
-            <input matInput formControlName="transactionId">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status">
-              <mat-option value="Received">Received</mat-option>
-              <mat-option value="Pending">Pending</mat-option>
-              <mat-option value="Failed">Failed</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" style="grid-column:1/-1">
-            <mat-label>Notes</mat-label>
-            <textarea matInput formControlName="notes" rows="2"></textarea>
-          </mat-form-field>
-
-        </div>
-        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
-          <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Payment</button>
-        </div>
-      </form>
     </div>
-  </div>
+  }
 </div>
-  `,
+`,
     styles: [`
     .p-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }

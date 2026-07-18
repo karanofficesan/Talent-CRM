@@ -19,9 +19,11 @@ const B_STATUS_COLOR: Record<string,string> = { 'Confirmed':'badge-success','In 
   </div>
 
   <div class="status-tabs" style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
-    <button *ngFor="let s of statuses" class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-full);padding:8px 16px;color:var(--text-secondary);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;font-weight:500;transition:all 0.2s">
-      {{ s }}
-    </button>
+    @for (s of statuses; track s) {
+      <button class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-full);padding:8px 16px;color:var(--text-secondary);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;font-weight:500;transition:all 0.2s">
+        {{ s }}
+      </button>
+    }
   </div>
 
   <div class="data-table-wrapper">
@@ -41,72 +43,88 @@ const B_STATUS_COLOR: Record<string,string> = { 'Confirmed':'badge-success','In 
         <th>Amount</th><th>Status</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let b of filtered">
-          <td><span style="font-weight:700;color:var(--color-primary)">{{ b.bookingNumber }}</span></td>
-          <td><div style="font-weight:600;font-size:13px">{{ b.clientName }}</div></td>
-          <td>{{ b.projectName }}</td>
-          <td>
-            <div style="font-size:13px;font-weight:500">{{ b.shootDate || 'TBD' }}</div>
-            <div style="font-size:11px;color:var(--text-muted)">{{ b.shootTime }}</div>
-          </td>
-          <td style="font-size:12px;color:var(--text-secondary)">{{ b.venue || 'TBD' }}</td>
-          <td>
-            <div style="display:flex;align-items:center">
-              <img *ngFor="let m of b.selectedModels.slice(0,3)" [src]="m.coverImage" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--bg-card);margin-left:-6px;first-child:margin-left:0">
-              <span *ngIf="b.selectedModels.length>3" style="font-size:11px;color:var(--text-muted);margin-left:4px">+{{ b.selectedModels.length-3 }}</span>
-            </div>
-          </td>
-          <td style="font-weight:700;color:var(--color-success)">₹{{ b.sellingPrice.toLocaleString() }}</td>
-          <td><span class="badge" [ngClass]="statusColor(b.status)">{{ b.status }}</span></td>
-          <td>
-            <div style="display:flex;gap:4px;align-items:center">
-              <button mat-icon-button (click)="viewBooking(b)" title="View"><mat-icon style="font-size:16px">visibility</mat-icon></button>
-              <button mat-stroked-button (click)="generateInvoice(b)" *ngIf="b.status!=='Cancelled'" style="font-size:11px;padding:3px 8px"><mat-icon style="font-size:14px">receipt</mat-icon> Invoice</button>
-              <button mat-icon-button color="warn" (click)="cancel(b)" *ngIf="b.status==='Confirmed'"><mat-icon style="font-size:16px">cancel</mat-icon></button>
-            </div>
-          </td>
-        </tr>
+        @for (b of filtered; track b) {
+          <tr>
+            <td><span style="font-weight:700;color:var(--color-primary)">{{ b.bookingNumber }}</span></td>
+            <td><div style="font-weight:600;font-size:13px">{{ b.clientName }}</div></td>
+            <td>{{ b.projectName }}</td>
+            <td>
+              <div style="font-size:13px;font-weight:500">{{ b.shootDate || 'TBD' }}</div>
+              <div style="font-size:11px;color:var(--text-muted)">{{ b.shootTime }}</div>
+            </td>
+            <td style="font-size:12px;color:var(--text-secondary)">{{ b.venue || 'TBD' }}</td>
+            <td>
+              <div style="display:flex;align-items:center">
+                @for (m of b.selectedModels.slice(0,3); track m) {
+                  <img [src]="m.coverImage" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--bg-card);margin-left:-6px;first-child:margin-left:0">
+                }
+                @if (b.selectedModels.length>3) {
+                  <span style="font-size:11px;color:var(--text-muted);margin-left:4px">+{{ b.selectedModels.length-3 }}</span>
+                }
+              </div>
+            </td>
+            <td style="font-weight:700;color:var(--color-success)">₹{{ b.sellingPrice.toLocaleString() }}</td>
+            <td><span class="badge" [ngClass]="statusColor(b.status)">{{ b.status }}</span></td>
+            <td>
+              <div style="display:flex;gap:4px;align-items:center">
+                <button mat-icon-button (click)="viewBooking(b)" title="View"><mat-icon style="font-size:16px">visibility</mat-icon></button>
+                @if (b.status!=='Cancelled') {
+                  <button mat-stroked-button (click)="generateInvoice(b)" style="font-size:11px;padding:3px 8px"><mat-icon style="font-size:14px">receipt</mat-icon> Invoice</button>
+                }
+                @if (b.status==='Confirmed') {
+                  <button mat-icon-button color="warn" (click)="cancel(b)"><mat-icon style="font-size:16px">cancel</mat-icon></button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:40px;color:var(--text-muted)">
-      <mat-icon style="font-size:48px;opacity:0.3">event_available</mat-icon>
-      <p style="margin-top:12px">No bookings found</p>
-    </div>
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <mat-icon style="font-size:48px;opacity:0.3">event_available</mat-icon>
+        <p style="margin-top:12px">No bookings found</p>
+      </div>
+    }
   </div>
 
   <!-- Detail Modal -->
-  <div class="dialog-overlay" *ngIf="viewingB" (click)="viewingB=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:660px;max-height:90vh;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <div><h3 style="margin:0;font-weight:700">{{ viewingB.bookingNumber }}</h3><div style="font-size:12px;color:var(--text-muted)">{{ viewingB.clientName }} · {{ viewingB.projectName }}</div></div>
-        <button mat-icon-button (click)="viewingB=null"><mat-icon>close</mat-icon></button>
-      </div>
-      <div style="padding:20px 24px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-          <div class="detail-field"><div class="df-lbl">Shoot Date</div><div class="df-val">{{ viewingB.shootDate || 'TBD' }}</div></div>
-          <div class="detail-field"><div class="df-lbl">Shoot Time</div><div class="df-val">{{ viewingB.shootTime }}</div></div>
-          <div class="detail-field"><div class="df-lbl">Venue</div><div class="df-val">{{ viewingB.venue || 'TBD' }}</div></div>
-          <div class="detail-field"><div class="df-lbl">Coordinator</div><div class="df-val">{{ viewingB.coordinator || '-' }}</div></div>
-          <div class="detail-field"><div class="df-lbl">Selling Price</div><div class="df-val" style="color:var(--color-success);font-weight:700">₹{{ viewingB.sellingPrice.toLocaleString() }}</div></div>
-          <div class="detail-field"><div class="df-lbl">Status</div><div class="df-val"><span class="badge" [ngClass]="statusColor(viewingB.status)">{{ viewingB.status }}</span></div></div>
+  @if (viewingB) {
+    <div class="dialog-overlay" (click)="viewingB=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:660px;max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <div><h3 style="margin:0;font-weight:700">{{ viewingB.bookingNumber }}</h3><div style="font-size:12px;color:var(--text-muted)">{{ viewingB.clientName }} · {{ viewingB.projectName }}</div></div>
+          <button mat-icon-button (click)="viewingB=null"><mat-icon>close</mat-icon></button>
         </div>
-        <h4 style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Models</h4>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div *ngFor="let m of viewingB.selectedModels" style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);border:1px solid var(--border)">
-            <img [src]="m.coverImage" style="width:44px;height:56px;object-fit:cover;border-radius:var(--radius-sm)">
-            <div style="flex:1"><div style="font-weight:600;font-size:13px">{{ m.modelName }}</div><div style="font-size:12px;color:var(--text-muted)">{{ m.height }}cm · {{ m.age }}y</div></div>
-            <div style="text-align:right"><div style="font-weight:700;color:var(--color-success)">₹{{ m.sellingPrice.toLocaleString() }}</div></div>
+        <div style="padding:20px 24px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+            <div class="detail-field"><div class="df-lbl">Shoot Date</div><div class="df-val">{{ viewingB.shootDate || 'TBD' }}</div></div>
+            <div class="detail-field"><div class="df-lbl">Shoot Time</div><div class="df-val">{{ viewingB.shootTime }}</div></div>
+            <div class="detail-field"><div class="df-lbl">Venue</div><div class="df-val">{{ viewingB.venue || 'TBD' }}</div></div>
+            <div class="detail-field"><div class="df-lbl">Coordinator</div><div class="df-val">{{ viewingB.coordinator || '-' }}</div></div>
+            <div class="detail-field"><div class="df-lbl">Selling Price</div><div class="df-val" style="color:var(--color-success);font-weight:700">₹{{ viewingB.sellingPrice.toLocaleString() }}</div></div>
+            <div class="detail-field"><div class="df-lbl">Status</div><div class="df-val"><span class="badge" [ngClass]="statusColor(viewingB.status)">{{ viewingB.status }}</span></div></div>
           </div>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
-          <button mat-stroked-button (click)="viewingB=null">Close</button>
-          <button mat-raised-button color="primary" (click)="generateInvoice(viewingB!);viewingB=null"><mat-icon>receipt</mat-icon> Generate Invoice</button>
+          <h4 style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Models</h4>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            @for (m of viewingB.selectedModels; track m) {
+              <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);border:1px solid var(--border)">
+                <img [src]="m.coverImage" style="width:44px;height:56px;object-fit:cover;border-radius:var(--radius-sm)">
+                <div style="flex:1"><div style="font-weight:600;font-size:13px">{{ m.modelName }}</div><div style="font-size:12px;color:var(--text-muted)">{{ m.height }}cm · {{ m.age }}y</div></div>
+                <div style="text-align:right"><div style="font-weight:700;color:var(--color-success)">₹{{ m.sellingPrice.toLocaleString() }}</div></div>
+              </div>
+            }
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+            <button mat-stroked-button (click)="viewingB=null">Close</button>
+            <button mat-raised-button color="primary" (click)="generateInvoice(viewingB!);viewingB=null"><mat-icon>receipt</mat-icon> Generate Invoice</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>
-  `,
+`,
     styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .b-table { width:100%; border-collapse:collapse;

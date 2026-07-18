@@ -24,10 +24,12 @@ import { Booking } from '../../core/models';
 
   <!-- Legend -->
   <div class="legend" style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap">
-    <div *ngFor="let l of legend" class="leg-item">
-      <div class="leg-dot" [ngStyle]="{'background':l.color}"></div>
-      <span>{{ l.label }}</span>
-    </div>
+    @for (l of legend; track l) {
+      <div class="leg-item">
+        <div class="leg-dot" [ngStyle]="{'background':l.color}"></div>
+        <span>{{ l.label }}</span>
+      </div>
+    }
   </div>
 
   <!-- Calendar Header -->
@@ -41,24 +43,32 @@ import { Booking } from '../../core/models';
 
     <!-- Day Labels -->
     <div class="day-labels">
-      <div *ngFor="let d of dayNames" class="day-label">{{ d }}</div>
+      @for (d of dayNames; track d) {
+        <div class="day-label">{{ d }}</div>
+      }
     </div>
 
     <!-- Calendar Grid -->
     <div class="cal-grid">
-      <div *ngFor="let cell of calCells" class="cal-cell"
-           [class.other-month]="!cell.isCurrentMonth"
-           [class.today]="cell.isToday"
-           (click)="selectDay(cell)">
-        <div class="cell-date">{{ cell.date }}</div>
-        <div class="cell-events">
-          <div *ngFor="let ev of cell.events.slice(0,2)" class="cal-event" [ngStyle]="{'background':ev.color}">
-            <div class="ev-client">{{ ev.client }}</div>
-            <div class="ev-models">{{ ev.models }}</div>
+      @for (cell of calCells; track cell) {
+        <div class="cal-cell"
+          [class.other-month]="!cell.isCurrentMonth"
+          [class.today]="cell.isToday"
+          (click)="selectDay(cell)">
+          <div class="cell-date">{{ cell.date }}</div>
+          <div class="cell-events">
+            @for (ev of cell.events.slice(0,2); track ev) {
+              <div class="cal-event" [ngStyle]="{'background':ev.color}">
+                <div class="ev-client">{{ ev.client }}</div>
+                <div class="ev-models">{{ ev.models }}</div>
+              </div>
+            }
+            @if (cell.events.length>2) {
+              <div class="more-events">+{{ cell.events.length-2 }} more</div>
+            }
           </div>
-          <div *ngIf="cell.events.length>2" class="more-events">+{{ cell.events.length-2 }} more</div>
         </div>
-      </div>
+      }
     </div>
   </div>
 
@@ -66,24 +76,28 @@ import { Booking } from '../../core/models';
   <div style="margin-top:24px">
     <div class="section-title">Upcoming Shoots</div>
     <div class="booking-list">
-      <div *ngFor="let b of upcomingBookings" class="booking-item">
-        <div class="booking-date-badge">
-          <div class="bdb-month">{{ getMonth(b.shootDate) }}</div>
-          <div class="bdb-day">{{ getDay(b.shootDate) }}</div>
+      @for (b of upcomingBookings; track b) {
+        <div class="booking-item">
+          <div class="booking-date-badge">
+            <div class="bdb-month">{{ getMonth(b.shootDate) }}</div>
+            <div class="bdb-day">{{ getDay(b.shootDate) }}</div>
+          </div>
+          <div class="booking-info">
+            <div style="font-weight:700;font-size:14px">{{ b.projectName }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">{{ b.clientName }} · {{ b.venue || 'Venue TBD' }}</div>
+            <div style="font-size:12px;color:var(--color-info);margin-top:2px">{{ b.selectedModels.length }} model(s) booked</div>
+          </div>
+          <div class="booking-time">{{ b.shootTime || 'Time TBD' }}</div>
+          <span class="badge badge-success">{{ b.status }}</span>
         </div>
-        <div class="booking-info">
-          <div style="font-weight:700;font-size:14px">{{ b.projectName }}</div>
-          <div style="font-size:12px;color:var(--text-muted)">{{ b.clientName }} · {{ b.venue || 'Venue TBD' }}</div>
-          <div style="font-size:12px;color:var(--color-info);margin-top:2px">{{ b.selectedModels.length }} model(s) booked</div>
-        </div>
-        <div class="booking-time">{{ b.shootTime || 'Time TBD' }}</div>
-        <span class="badge badge-success">{{ b.status }}</span>
-      </div>
-      <div *ngIf="upcomingBookings.length===0" style="text-align:center;padding:30px;color:var(--text-muted)">No upcoming shoots</div>
+      }
+      @if (upcomingBookings.length===0) {
+        <div style="text-align:center;padding:30px;color:var(--text-muted)">No upcoming shoots</div>
+      }
     </div>
   </div>
 </div>
-  `,
+`,
     styles: [`
     .view-toggle { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;
       button { background:none; border:none; color:var(--text-secondary); padding:8px 16px; cursor:pointer; font-size:13px; font-weight:500; font-family:inherit; transition:all 0.2s;

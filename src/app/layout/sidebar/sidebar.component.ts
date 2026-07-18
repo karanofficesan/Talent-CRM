@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
@@ -11,7 +11,7 @@ interface NavItem {
 
 @Component({
     selector: 'app-sidebar',
-    imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule, MatRippleModule],
+    imports: [RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule, MatRippleModule],
     template: `
     <aside class="sidebar" [class.collapsed]="collapsed">
       <!-- Brand -->
@@ -19,42 +19,56 @@ interface NavItem {
         <div class="brand-logo">
           <span class="logo-icon">T</span>
         </div>
-        <div class="brand-text" *ngIf="!collapsed">
-          <span class="brand-name">TalentCRM</span>
-          <span class="brand-sub">Agency Platform</span>
-        </div>
+        @if (!collapsed) {
+          <div class="brand-text">
+            <span class="brand-name">TalentCRM</span>
+            <span class="brand-sub">Agency Platform</span>
+          </div>
+        }
       </div>
-
+    
       <!-- Nav -->
       <nav class="nav-list">
-        <div class="nav-section" *ngFor="let section of navSections">
-          <span class="nav-section-label" *ngIf="!collapsed">{{ section.title }}</span>
-          <a *ngFor="let item of section.items"
-             [routerLink]="item.route"
-             routerLinkActive="active"
-             class="nav-item"
-             matRipple
-             [matTooltip]="collapsed ? item.label : ''"
-             matTooltipPosition="right">
-            <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
-            <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
-            <span class="nav-badge" *ngIf="item.badge && !collapsed">{{ item.badge }}</span>
-          </a>
-        </div>
+        @for (section of navSections; track section) {
+          <div class="nav-section">
+            @if (!collapsed) {
+              <span class="nav-section-label">{{ section.title }}</span>
+            }
+            @for (item of section.items; track item) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                class="nav-item"
+                matRipple
+                [matTooltip]="collapsed ? item.label : ''"
+                matTooltipPosition="right">
+                <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+                @if (!collapsed) {
+                  <span class="nav-label">{{ item.label }}</span>
+                }
+                @if (item.badge && !collapsed) {
+                  <span class="nav-badge">{{ item.badge }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
       </nav>
-
+    
       <!-- Footer -->
-      <div class="sidebar-footer" *ngIf="!collapsed">
-        <div class="user-info">
-          <div class="user-avatar">RA</div>
-          <div class="user-details">
-            <span class="user-name">Rahul Admin</span>
-            <span class="user-role">Super Admin</span>
+      @if (!collapsed) {
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar">RA</div>
+            <div class="user-details">
+              <span class="user-name">Rahul Admin</span>
+              <span class="user-role">Super Admin</span>
+            </div>
           </div>
         </div>
-      </div>
+      }
     </aside>
-  `,
+    `,
     styles: [`
     .sidebar {
       width: var(--sidebar-width);

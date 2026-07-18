@@ -42,121 +42,131 @@ import { User } from '../../core/models';
         <th>Status</th><th>Last Login</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let u of filtered">
-          <td>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div class="u-avatar">{{ u.avatar }}</div>
-              <div>
-                <div style="font-weight:600;font-size:14px;color:var(--text-primary)">{{ u.name }}</div>
-                <div style="font-size:12px;color:var(--text-muted)">Joined: {{ u.createdAt }}</div>
+        @for (u of filtered; track u) {
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="u-avatar">{{ u.avatar }}</div>
+                <div>
+                  <div style="font-weight:600;font-size:14px;color:var(--text-primary)">{{ u.name }}</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Joined: {{ u.createdAt }}</div>
+                </div>
               </div>
-            </div>
-          </td>
-          <td>
-            <div style="font-size:13px;font-weight:500">{{ u.email }}</div>
-            <div style="font-size:12px;color:var(--text-muted)">{{ u.mobile }}</div>
-          </td>
-          <td>
-            <span class="role-badge" [ngClass]="getRoleClass(u.role)">{{ u.role }}</span>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="u.status==='Active'?'badge-success':'badge-danger'">{{ u.status }}</span>
-          </td>
-          <td style="font-size:13px;color:var(--text-muted)">{{ u.lastLogin || 'Never' }}</td>
-          <td>
-            <div style="display:flex;gap:4px">
-              <button mat-icon-button (click)="openForm(u)" matTooltip="Edit User"><mat-icon style="font-size:18px">edit</mat-icon></button>
-              <button mat-icon-button color="warn" (click)="deleteUser(u)" matTooltip="Delete User"><mat-icon style="font-size:18px">delete</mat-icon></button>
-            </div>
-          </td>
-        </tr>
+            </td>
+            <td>
+              <div style="font-size:13px;font-weight:500">{{ u.email }}</div>
+              <div style="font-size:12px;color:var(--text-muted)">{{ u.mobile }}</div>
+            </td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleClass(u.role)">{{ u.role }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="u.status==='Active'?'badge-success':'badge-danger'">{{ u.status }}</span>
+            </td>
+            <td style="font-size:13px;color:var(--text-muted)">{{ u.lastLogin || 'Never' }}</td>
+            <td>
+              <div style="display:flex;gap:4px">
+                <button mat-icon-button (click)="openForm(u)" matTooltip="Edit User"><mat-icon style="font-size:18px">edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteUser(u)" matTooltip="Delete User"><mat-icon style="font-size:18px">delete</mat-icon></button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:40px;color:var(--text-muted)">
-      <mat-icon style="font-size:48px;opacity:0.3">group_off</mat-icon>
-      <p style="margin-top:12px">No users found</p>
-    </div>
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <mat-icon style="font-size:48px;opacity:0.3">group_off</mat-icon>
+        <p style="margin-top:12px">No users found</p>
+      </div>
+    }
   </div>
 
   <!-- Form Dialog -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:500px">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit User' : 'Add New User' }}</h3>
-        <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
-      </div>
-      <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          
-          <mat-form-field appearance="outline" style="width:100%">
-            <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name">
-            <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" style="width:100%">
-            <mat-label>Email Address</mat-label>
-            <input matInput type="email" formControlName="email">
-            <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
-            <mat-error *ngIf="form.get('email')?.hasError('email')">Invalid email format</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" style="width:100%">
-            <mat-label>Mobile Number</mat-label>
-            <input matInput formControlName="mobile">
-            <mat-error *ngIf="form.get('mobile')?.hasError('required')">Mobile number is required</mat-error>
-          </mat-form-field>
-
-          <div style="display:flex;gap:16px">
-            <mat-form-field appearance="outline" style="flex:1">
-              <mat-label>Role</mat-label>
-              <mat-select formControlName="role">
-                <mat-option value="Super Admin">Super Admin</mat-option>
-                <mat-option value="Admin">Admin</mat-option>
-                <mat-option value="Talent Manager">Talent Manager</mat-option>
-                <mat-option value="Finance">Finance</mat-option>
-                <mat-option value="Viewer">Viewer</mat-option>
-              </mat-select>
+  @if (showForm) {
+    <div class="dialog-overlay" (click)="showForm=false">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:500px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit User' : 'Add New User' }}</h3>
+          <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <mat-form-field appearance="outline" style="width:100%">
+              <mat-label>Full Name</mat-label>
+              <input matInput formControlName="name">
+              @if (form.get('name')?.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+              }
             </mat-form-field>
-
-            <mat-form-field appearance="outline" style="flex:1">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="Active">Active</mat-option>
-                <mat-option value="Inactive">Inactive</mat-option>
-              </mat-select>
+            <mat-form-field appearance="outline" style="width:100%">
+              <mat-label>Email Address</mat-label>
+              <input matInput type="email" formControlName="email">
+              @if (form.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (form.get('email')?.hasError('email')) {
+                <mat-error>Invalid email format</mat-error>
+              }
             </mat-form-field>
+            <mat-form-field appearance="outline" style="width:100%">
+              <mat-label>Mobile Number</mat-label>
+              <input matInput formControlName="mobile">
+              @if (form.get('mobile')?.hasError('required')) {
+                <mat-error>Mobile number is required</mat-error>
+              }
+            </mat-form-field>
+            <div style="display:flex;gap:16px">
+              <mat-form-field appearance="outline" style="flex:1">
+                <mat-label>Role</mat-label>
+                <mat-select formControlName="role">
+                  <mat-option value="Super Admin">Super Admin</mat-option>
+                  <mat-option value="Admin">Admin</mat-option>
+                  <mat-option value="Talent Manager">Talent Manager</mat-option>
+                  <mat-option value="Finance">Finance</mat-option>
+                  <mat-option value="Viewer">Viewer</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" style="flex:1">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="Active">Active</mat-option>
+                  <mat-option value="Inactive">Inactive</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
           </div>
-
-        </div>
-        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px">
-          <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save User</button>
-        </div>
-      </form>
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px">
+            <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save User</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  }
 
   <!-- Delete Confirmation Dialog -->
-  <div class="dialog-overlay" *ngIf="deletingUser" (click)="deletingUser=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
-      <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-        <mat-icon style="font-size:32px;width:32px;height:32px">person_remove</mat-icon>
-      </div>
-      <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Remove User?</h3>
-      <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
-        Are you sure you want to permanently remove <strong>{{ deletingUser.name }}</strong>?<br>
-        They will lose all access to the CRM.
-      </p>
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button mat-stroked-button (click)="deletingUser=null">Cancel</button>
-        <button mat-raised-button color="warn" (click)="confirmDelete()">Remove User</button>
+  @if (deletingUser) {
+    <div class="dialog-overlay" (click)="deletingUser=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
+        <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <mat-icon style="font-size:32px;width:32px;height:32px">person_remove</mat-icon>
+        </div>
+        <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Remove User?</h3>
+        <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
+          Are you sure you want to permanently remove <strong>{{ deletingUser.name }}</strong>?<br>
+          They will lose all access to the CRM.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button mat-stroked-button (click)="deletingUser=null">Cancel</button>
+          <button mat-raised-button color="warn" (click)="confirmDelete()">Remove User</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
 </div>
-  `,
+`,
     styles: [`
     .u-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }

@@ -39,194 +39,197 @@ import jsPDF from 'jspdf';
         <th>Total Amount</th><th>Balance Due</th><th>Status</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let i of filtered">
-          <td><span style="font-weight:700;color:var(--color-primary)">{{ i.invoiceNumber }}</span></td>
-          <td>
-            <div style="font-weight:500;font-size:12px">{{ i.createdAt }}</div>
-            <div style="font-size:11px;color:var(--text-muted)">Due: {{ i.dueDate }}</div>
-          </td>
-          <td><div style="font-weight:600;font-size:13px">{{ i.clientName }}</div></td>
-          <td style="font-size:12px;color:var(--text-secondary)">{{ i.bookingNumber || '-' }}</td>
-          <td style="font-weight:700">₹{{ i.totalAmount.toLocaleString() }}</td>
-          <td style="font-weight:700;color:var(--color-danger)">₹{{ (i.totalAmount - i.paidAmount).toLocaleString() }}</td>
-          <td>
-            <span class="badge" 
-              [ngClass]="i.status==='Paid'?'badge-success':(i.status==='Pending'?'badge-warning':(i.status==='Overdue'?'badge-danger':'badge-info'))">
-              {{ i.status }}
-            </span>
-          </td>
-          <td>
-            <div style="display:flex;gap:4px;align-items:center">
-              <button mat-icon-button (click)="openView(i)" matTooltip="View Invoice"><mat-icon style="font-size:18px">visibility</mat-icon></button>
-              <button mat-icon-button (click)="downloadPDF(i)" matTooltip="Download PDF"
-                style="background:rgba(220,38,38,0.1);color:#DC2626;border-radius:8px">
-                <mat-icon style="font-size:20px;width:20px;height:20px">picture_as_pdf</mat-icon>
-              </button>
-              <button mat-icon-button (click)="openForm(i)" matTooltip="Edit Invoice"><mat-icon style="font-size:18px">edit</mat-icon></button>
-              <button mat-icon-button color="warn" (click)="deleteInvoice(i)" matTooltip="Delete Invoice"><mat-icon style="font-size:18px">delete</mat-icon></button>
-            </div>
-          </td>
-        </tr>
+        @for (i of filtered; track i) {
+          <tr>
+            <td><span style="font-weight:700;color:var(--color-primary)">{{ i.invoiceNumber }}</span></td>
+            <td>
+              <div style="font-weight:500;font-size:12px">{{ i.createdAt }}</div>
+              <div style="font-size:11px;color:var(--text-muted)">Due: {{ i.dueDate }}</div>
+            </td>
+            <td><div style="font-weight:600;font-size:13px">{{ i.clientName }}</div></td>
+            <td style="font-size:12px;color:var(--text-secondary)">{{ i.bookingNumber || '-' }}</td>
+            <td style="font-weight:700">₹{{ i.totalAmount.toLocaleString() }}</td>
+            <td style="font-weight:700;color:var(--color-danger)">₹{{ (i.totalAmount - i.paidAmount).toLocaleString() }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="i.status==='Paid'?'badge-success':(i.status==='Pending'?'badge-warning':(i.status==='Overdue'?'badge-danger':'badge-info'))">
+                {{ i.status }}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;align-items:center">
+                <button mat-icon-button (click)="openView(i)" matTooltip="View Invoice"><mat-icon style="font-size:18px">visibility</mat-icon></button>
+                <button mat-icon-button (click)="downloadPDF(i)" matTooltip="Download PDF"
+                  style="background:rgba(220,38,38,0.1);color:#DC2626;border-radius:8px">
+                  <mat-icon style="font-size:20px;width:20px;height:20px">picture_as_pdf</mat-icon>
+                </button>
+                <button mat-icon-button (click)="openForm(i)" matTooltip="Edit Invoice"><mat-icon style="font-size:18px">edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteInvoice(i)" matTooltip="Delete Invoice"><mat-icon style="font-size:18px">delete</mat-icon></button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:40px;color:var(--text-muted)">
-      <mat-icon style="font-size:48px;opacity:0.3">receipt_long</mat-icon>
-      <p style="margin-top:12px">No invoices found</p>
-    </div>
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <mat-icon style="font-size:48px;opacity:0.3">receipt_long</mat-icon>
+        <p style="margin-top:12px">No invoices found</p>
+      </div>
+    }
   </div>
 
   <!-- Form Dialog -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
-    <div class="inline-dialog" (click)="$event.stopPropagation()">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Invoice' : 'Create Invoice' }}</h3>
-        <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
-      </div>
-      <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
-        <div class="form-grid2">
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Client</mat-label>
-            <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
-              <mat-option *ngFor="let c of clients" [value]="c.id">{{ c.companyName }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Link Booking (Optional)</mat-label>
-            <mat-select formControlName="bookingId" (selectionChange)="onBookingChange($event.value)">
-              <mat-option value="">-- None --</mat-option>
-              <mat-option *ngFor="let b of clientBookings" [value]="b.id">{{ b.bookingNumber }} - {{ b.projectName }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Project Name</mat-label>
-            <input matInput formControlName="projectName">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Due Date</mat-label>
-            <input matInput type="date" formControlName="dueDate">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Base Amount (₹)</mat-label>
-            <input matInput type="number" formControlName="amount" (input)="calcTotal()">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>GST %</mat-label>
-            <input matInput type="number" formControlName="gstPercent" (input)="calcTotal()">
-          </mat-form-field>
-
-          <div style="grid-column:1/-1; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; display:flex; justify-content:space-between; align-items:center">
-            <div>
-              <div style="font-size:12px;color:var(--text-muted)">GST Amount</div>
-              <div style="font-size:14px;font-weight:600">₹{{ calculatedGst.toLocaleString() }}</div>
+  @if (showForm) {
+    <div class="dialog-overlay" (click)="showForm=false">
+      <div class="inline-dialog" (click)="$event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Invoice' : 'Create Invoice' }}</h3>
+          <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
+          <div class="form-grid2">
+            <mat-form-field appearance="outline">
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
+                @for (c of clients; track c) {
+                  <mat-option [value]="c.id">{{ c.companyName }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Link Booking (Optional)</mat-label>
+              <mat-select formControlName="bookingId" (selectionChange)="onBookingChange($event.value)">
+                <mat-option value="">-- None --</mat-option>
+                @for (b of clientBookings; track b) {
+                  <mat-option [value]="b.id">{{ b.bookingNumber }} - {{ b.projectName }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Project Name</mat-label>
+              <input matInput formControlName="projectName">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Due Date</mat-label>
+              <input matInput type="date" formControlName="dueDate">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Base Amount (₹)</mat-label>
+              <input matInput type="number" formControlName="amount" (input)="calcTotal()">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>GST %</mat-label>
+              <input matInput type="number" formControlName="gstPercent" (input)="calcTotal()">
+            </mat-form-field>
+            <div style="grid-column:1/-1; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; display:flex; justify-content:space-between; align-items:center">
+              <div>
+                <div style="font-size:12px;color:var(--text-muted)">GST Amount</div>
+                <div style="font-size:14px;font-weight:600">₹{{ calculatedGst.toLocaleString() }}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:12px;color:var(--text-muted)">Total Invoice Value</div>
+                <div style="font-size:20px;font-weight:800;color:var(--color-primary)">₹{{ calculatedTotal.toLocaleString() }}</div>
+              </div>
             </div>
-            <div style="text-align:right">
-              <div style="font-size:12px;color:var(--text-muted)">Total Invoice Value</div>
-              <div style="font-size:20px;font-weight:800;color:var(--color-primary)">₹{{ calculatedTotal.toLocaleString() }}</div>
-            </div>
+            <mat-form-field appearance="outline" style="grid-column:1/-1; margin-top:8px">
+              <mat-label>Notes</mat-label>
+              <textarea matInput formControlName="notes" rows="2"></textarea>
+            </mat-form-field>
           </div>
-
-          <mat-form-field appearance="outline" style="grid-column:1/-1; margin-top:8px">
-            <mat-label>Notes</mat-label>
-            <textarea matInput formControlName="notes" rows="2"></textarea>
-          </mat-form-field>
-
-        </div>
-        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
-          <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Invoice</button>
-        </div>
-      </form>
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+            <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Invoice</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  }
 
   <!-- View Invoice Dialog -->
-  <div class="dialog-overlay" *ngIf="viewingInv" (click)="viewingInv=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:700px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:24px;border-bottom:1px solid var(--border);background:#F8FAFC">
-        <div>
-          <h2 style="margin:0 0 4px;font-size:24px;font-weight:800;color:var(--color-primary)">INVOICE</h2>
-          <div style="font-size:13px;font-weight:600">{{ viewingInv.invoiceNumber }}</div>
-          <div style="font-size:12px;color:var(--text-muted)">Date: {{ viewingInv.createdAt }}</div>
-        </div>
-        <div style="text-align:right">
-          <h3 style="margin:0 0 4px;font-size:16px;font-weight:700">{{ viewingInv.clientName }}</h3>
-          <div style="font-size:12px;color:var(--text-muted)">Project: {{ viewingInv.projectName }}</div>
-          <div style="font-size:12px;color:var(--text-muted)">Due: {{ viewingInv.dueDate }}</div>
-        </div>
-      </div>
-      
-      <div style="padding:24px">
-        <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
-          <tr style="border-bottom:2px solid var(--border)">
-            <th style="text-align:left;padding:8px 0;font-size:12px;color:var(--text-muted);text-transform:uppercase">Description</th>
-            <th style="text-align:right;padding:8px 0;font-size:12px;color:var(--text-muted);text-transform:uppercase">Amount</th>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:12px 0;font-size:14px;font-weight:500">Shoot & Model Charges - {{ viewingInv.projectName }}</td>
-            <td style="text-align:right;padding:12px 0;font-size:14px">₹{{ viewingInv.amount.toLocaleString() }}</td>
-          </tr>
-        </table>
-
-        <div style="display:flex;justify-content:flex-end">
-          <div style="width:250px">
-            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px">
-              <span style="color:var(--text-muted)">Subtotal:</span><span>₹{{ viewingInv.amount.toLocaleString() }}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)">
-              <span style="color:var(--text-muted)">GST ({{ viewingInv.gstPercent }}%):</span><span>₹{{ viewingInv.gstAmount.toLocaleString() }}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:800;color:var(--color-primary)">
-              <span>Total:</span><span>₹{{ viewingInv.totalAmount.toLocaleString() }}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px">
-              <span style="color:var(--text-muted)">Amount Paid:</span><span style="color:var(--color-success)">₹{{ viewingInv.paidAmount.toLocaleString() }}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;font-weight:700">
-              <span style="color:var(--color-danger)">Balance Due:</span><span style="color:var(--color-danger)">₹{{ (viewingInv.totalAmount - viewingInv.paidAmount).toLocaleString() }}</span>
-            </div>
+  @if (viewingInv) {
+    <div class="dialog-overlay" (click)="viewingInv=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:700px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:24px;border-bottom:1px solid var(--border);background:#F8FAFC">
+          <div>
+            <h2 style="margin:0 0 4px;font-size:24px;font-weight:800;color:var(--color-primary)">INVOICE</h2>
+            <div style="font-size:13px;font-weight:600">{{ viewingInv.invoiceNumber }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">Date: {{ viewingInv.createdAt }}</div>
+          </div>
+          <div style="text-align:right">
+            <h3 style="margin:0 0 4px;font-size:16px;font-weight:700">{{ viewingInv.clientName }}</h3>
+            <div style="font-size:12px;color:var(--text-muted)">Project: {{ viewingInv.projectName }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">Due: {{ viewingInv.dueDate }}</div>
           </div>
         </div>
-
-        <div *ngIf="viewingInv.notes" style="margin-top:24px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted)">
-          <strong>Notes:</strong><br>{{ viewingInv.notes }}
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)">
-          <button mat-stroked-button (click)="viewingInv=null">Close</button>
-          <button mat-stroked-button color="primary" (click)="downloadPDF(viewingInv!)">
-            <mat-icon>picture_as_pdf</mat-icon> Download PDF
-          </button>
+        <div style="padding:24px">
+          <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+            <tr style="border-bottom:2px solid var(--border)">
+              <th style="text-align:left;padding:8px 0;font-size:12px;color:var(--text-muted);text-transform:uppercase">Description</th>
+              <th style="text-align:right;padding:8px 0;font-size:12px;color:var(--text-muted);text-transform:uppercase">Amount</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:12px 0;font-size:14px;font-weight:500">Shoot & Model Charges - {{ viewingInv.projectName }}</td>
+              <td style="text-align:right;padding:12px 0;font-size:14px">₹{{ viewingInv.amount.toLocaleString() }}</td>
+            </tr>
+          </table>
+          <div style="display:flex;justify-content:flex-end">
+            <div style="width:250px">
+              <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px">
+                <span style="color:var(--text-muted)">Subtotal:</span><span>₹{{ viewingInv.amount.toLocaleString() }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)">
+                <span style="color:var(--text-muted)">GST ({{ viewingInv.gstPercent }}%):</span><span>₹{{ viewingInv.gstAmount.toLocaleString() }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:800;color:var(--color-primary)">
+                <span>Total:</span><span>₹{{ viewingInv.totalAmount.toLocaleString() }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px">
+                <span style="color:var(--text-muted)">Amount Paid:</span><span style="color:var(--color-success)">₹{{ viewingInv.paidAmount.toLocaleString() }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;font-weight:700">
+                <span style="color:var(--color-danger)">Balance Due:</span><span style="color:var(--color-danger)">₹{{ (viewingInv.totalAmount - viewingInv.paidAmount).toLocaleString() }}</span>
+              </div>
+            </div>
+          </div>
+          @if (viewingInv.notes) {
+            <div style="margin-top:24px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted)">
+              <strong>Notes:</strong><br>{{ viewingInv.notes }}
+            </div>
+          }
+          <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)">
+            <button mat-stroked-button (click)="viewingInv=null">Close</button>
+            <button mat-stroked-button color="primary" (click)="downloadPDF(viewingInv!)">
+              <mat-icon>picture_as_pdf</mat-icon> Download PDF
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Delete Confirmation Dialog -->
-  <div class="dialog-overlay" *ngIf="deletingInv" (click)="deletingInv=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
-      <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-        <mat-icon style="font-size:32px;width:32px;height:32px">warning</mat-icon>
-      </div>
-      <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Invoice?</h3>
-      <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
-        Are you sure you want to permanently delete <strong>{{ deletingInv.invoiceNumber }}</strong>?<br>
-        This action cannot be undone.
-      </p>
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button mat-stroked-button (click)="deletingInv=null">Cancel</button>
-        <button mat-raised-button color="warn" (click)="confirmDelete()">Delete Invoice</button>
+  @if (deletingInv) {
+    <div class="dialog-overlay" (click)="deletingInv=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
+        <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <mat-icon style="font-size:32px;width:32px;height:32px">warning</mat-icon>
+        </div>
+        <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Invoice?</h3>
+        <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
+          Are you sure you want to permanently delete <strong>{{ deletingInv.invoiceNumber }}</strong>?<br>
+          This action cannot be undone.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button mat-stroked-button (click)="deletingInv=null">Cancel</button>
+          <button mat-raised-button color="warn" (click)="confirmDelete()">Delete Invoice</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
 </div>
-  `,
+`,
     styles: [`
     .inv-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }

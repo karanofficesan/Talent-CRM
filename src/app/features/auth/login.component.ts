@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
+    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
     template: `
 <div class="login-wrapper">
   <div class="login-card">
@@ -23,13 +23,15 @@ import { AuthService } from '../../core/services/auth.service';
       <h2>Welcome Back</h2>
       <p>Please sign in to your account</p>
     </div>
-    
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Email Address</mat-label>
         <input matInput formControlName="email" type="email" placeholder="admin@talentcrm.com">
         <mat-icon matPrefix>email</mat-icon>
-        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+        @if (loginForm.get('email')?.hasError('required')) {
+          <mat-error>Email is required</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -39,20 +41,22 @@ import { AuthService } from '../../core/services/auth.service';
         <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
           <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
-        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+        @if (loginForm.get('password')?.hasError('required')) {
+          <mat-error>Password is required</mat-error>
+        }
       </mat-form-field>
 
       <button mat-raised-button color="primary" class="login-btn" type="submit" [disabled]="loginForm.invalid">
         Sign In
       </button>
     </form>
-    
+
     <div class="login-footer">
       <p><strong>Demo Credentials:</strong><br>Email: <span>admin&#64;talentcrm.com</span><br>Pass: <span>password123</span></p>
     </div>
   </div>
 </div>
-  `,
+`,
     styles: [`
     .login-wrapper {
       display: flex; justify-content: center; align-items: center;

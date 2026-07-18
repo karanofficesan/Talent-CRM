@@ -27,91 +27,106 @@ const STATUS_COLORS: Record<string, string> = {
 
   <!-- Status Tabs -->
   <div class="status-tabs">
-    <button *ngFor="let s of statuses" class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()">
-      {{ s }} <span class="tab-count">{{ countByStatus(s) }}</span>
-    </button>
+    @for (s of statuses; track s) {
+      <button class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()">
+        {{ s }} <span class="tab-count">{{ countByStatus(s) }}</span>
+      </button>
+    }
   </div>
 
   <div class="req-grid">
-    <div class="req-card" *ngFor="let r of filtered">
-      <div class="req-head">
-        <div>
-          <div class="req-project">{{ r.projectName }}</div>
-          <div class="req-client">{{ r.clientName }}</div>
+    @for (r of filtered; track r) {
+      <div class="req-card">
+        <div class="req-head">
+          <div>
+            <div class="req-project">{{ r.projectName }}</div>
+            <div class="req-client">{{ r.clientName }}</div>
+          </div>
+          <span class="badge" [ngClass]="statusColor(r.status)">{{ r.status }}</span>
         </div>
-        <span class="badge" [ngClass]="statusColor(r.status)">{{ r.status }}</span>
-      </div>
-      
-      <div class="req-body">
-        <div class="req-info"><mat-icon>calendar_today</mat-icon> {{ r.shootDate }}</div>
-        <div class="req-info"><mat-icon>location_on</mat-icon> {{ r.shootLocation }}</div>
-        <div class="req-info"><mat-icon>people</mat-icon> {{ r.modelsRequired }} models · {{ r.gender }}</div>
-        <div class="req-info"><mat-icon>straighten</mat-icon> Age {{ r.ageMin }}-{{ r.ageMax }}y · Height {{ r.heightMin }}-{{ r.heightMax }}cm</div>
-        <div class="req-info"><mat-icon>category</mat-icon> {{ r.category }}</div>
-        <div class="req-info"><mat-icon>currency_rupee</mat-icon> Budget ₹{{ r.budget.toLocaleString() }}</div>
-        <div *ngIf="r.additionalRequirements" class="req-notes">{{ r.additionalRequirements }}</div>
-      </div>
-
-      <div class="req-footer">
-        <div style="display:flex;gap:6px">
-          <button mat-stroked-button (click)="changeStatus(r,'Shortlisting')" *ngIf="r.status==='New'">Shortlist</button>
-          <button mat-stroked-button (click)="changeStatus(r,'Quotation Sent')" *ngIf="r.status==='Shortlisting'">Send Quotation</button>
-          <button mat-stroked-button (click)="changeStatus(r,'Confirmed')" *ngIf="r.status==='Quotation Sent'">Confirm</button>
+        <div class="req-body">
+          <div class="req-info"><mat-icon>calendar_today</mat-icon> {{ r.shootDate }}</div>
+          <div class="req-info"><mat-icon>location_on</mat-icon> {{ r.shootLocation }}</div>
+          <div class="req-info"><mat-icon>people</mat-icon> {{ r.modelsRequired }} models · {{ r.gender }}</div>
+          <div class="req-info"><mat-icon>straighten</mat-icon> Age {{ r.ageMin }}-{{ r.ageMax }}y · Height {{ r.heightMin }}-{{ r.heightMax }}cm</div>
+          <div class="req-info"><mat-icon>category</mat-icon> {{ r.category }}</div>
+          <div class="req-info"><mat-icon>currency_rupee</mat-icon> Budget ₹{{ r.budget.toLocaleString() }}</div>
+          @if (r.additionalRequirements) {
+            <div class="req-notes">{{ r.additionalRequirements }}</div>
+          }
         </div>
-        
-        <div style="display:flex;gap:4px">
-          <button mat-icon-button (click)="openForm(r)"><mat-icon>edit</mat-icon></button>
-          <button mat-icon-button color="warn" (click)="changeStatus(r,'Cancelled')"><mat-icon>cancel</mat-icon></button>
+        <div class="req-footer">
+          <div style="display:flex;gap:6px">
+            @if (r.status==='New') {
+              <button mat-stroked-button (click)="changeStatus(r,'Shortlisting')">Shortlist</button>
+            }
+            @if (r.status==='Shortlisting') {
+              <button mat-stroked-button (click)="changeStatus(r,'Quotation Sent')">Send Quotation</button>
+            }
+            @if (r.status==='Quotation Sent') {
+              <button mat-stroked-button (click)="changeStatus(r,'Confirmed')">Confirm</button>
+            }
+          </div>
+          <div style="display:flex;gap:4px">
+            <button mat-icon-button (click)="openForm(r)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button color="warn" (click)="changeStatus(r,'Cancelled')"><mat-icon>cancel</mat-icon></button>
+          </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 
   <!-- Form Overlay -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
-    <div class="inline-dialog" (click)="$event.stopPropagation()">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <h3 style="margin:0;font-size:18px;font-weight:700">{{ editing?.id ? 'Edit Requirement' : 'New Requirement' }}</h3>
-        <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+  @if (showForm) {
+    <div class="dialog-overlay" (click)="showForm=false">
+      <div class="inline-dialog" (click)="$event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <h3 style="margin:0;font-size:18px;font-weight:700">{{ editing?.id ? 'Edit Requirement' : 'New Requirement' }}</h3>
+          <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
+          <div class="form-grid2">
+            <mat-form-field appearance="outline">
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
+                @for (c of clients; track c) {
+                  <mat-option [value]="c.id">{{ c.companyName }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Project Name</mat-label><input matInput formControlName="projectName"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Shoot Date</mat-label><input matInput type="date" formControlName="shootDate"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Shoot Location</mat-label><input matInput formControlName="shootLocation"></mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Gender</mat-label>
+              <mat-select formControlName="gender"><mat-option value="Male">Male</mat-option><mat-option value="Female">Female</mat-option><mat-option value="Any">Any</mat-option></mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category">
+                @for (c of categories; track c) {
+                  <mat-option [value]="c">{{ c }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Min Age</mat-label><input matInput type="number" formControlName="ageMin"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Max Age</mat-label><input matInput type="number" formControlName="ageMax"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Min Height (cm)</mat-label><input matInput type="number" formControlName="heightMin"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Max Height (cm)</mat-label><input matInput type="number" formControlName="heightMax"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>No. of Models Required</mat-label><input matInput type="number" formControlName="modelsRequired"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Budget (₹)</mat-label><input matInput type="number" formControlName="budget"></mat-form-field>
+            <mat-form-field appearance="outline" style="grid-column:1/-1"><mat-label>Additional Requirements</mat-label><textarea matInput formControlName="additionalRequirements" rows="2"></textarea></mat-form-field>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+            <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Requirement</button>
+          </div>
+        </form>
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
-        <div class="form-grid2">
-          <mat-form-field appearance="outline">
-            <mat-label>Client</mat-label>
-            <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
-              <mat-option *ngFor="let c of clients" [value]="c.id">{{ c.companyName }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Project Name</mat-label><input matInput formControlName="projectName"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Shoot Date</mat-label><input matInput type="date" formControlName="shootDate"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Shoot Location</mat-label><input matInput formControlName="shootLocation"></mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Gender</mat-label>
-            <mat-select formControlName="gender"><mat-option value="Male">Male</mat-option><mat-option value="Female">Female</mat-option><mat-option value="Any">Any</mat-option></mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="category">
-              <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Min Age</mat-label><input matInput type="number" formControlName="ageMin"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Max Age</mat-label><input matInput type="number" formControlName="ageMax"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Min Height (cm)</mat-label><input matInput type="number" formControlName="heightMin"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Max Height (cm)</mat-label><input matInput type="number" formControlName="heightMax"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>No. of Models Required</mat-label><input matInput type="number" formControlName="modelsRequired"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Budget (₹)</mat-label><input matInput type="number" formControlName="budget"></mat-form-field>
-          <mat-form-field appearance="outline" style="grid-column:1/-1"><mat-label>Additional Requirements</mat-label><textarea matInput formControlName="additionalRequirements" rows="2"></textarea></mat-form-field>
-        </div>
-        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
-          <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save Requirement</button>
-        </div>
-      </form>
     </div>
-  </div>
+  }
 </div>
-  `,
+`,
     styles: [`
     .status-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
     .tab-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-full); padding:8px 16px; color:var(--text-secondary); font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s; font-family:inherit;

@@ -38,63 +38,70 @@ import { Client } from '../../core/models';
         <th>Payment Terms</th><th>Status</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let c of filtered">
-          <td>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div class="c-avatar">{{ c.companyName.charAt(0) }}</div>
-              <div>
-                <div style="font-weight:700;font-size:14px;color:var(--text-primary)">{{ c.companyName }}</div>
-                <div style="font-size:11px;color:var(--text-muted)" *ngIf="c.gstNumber">GST: {{ c.gstNumber }}</div>
+        @for (c of filtered; track c) {
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="c-avatar">{{ c.companyName.charAt(0) }}</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;color:var(--text-primary)">{{ c.companyName }}</div>
+                  @if (c.gstNumber) {
+                    <div style="font-size:11px;color:var(--text-muted)">GST: {{ c.gstNumber }}</div>
+                  }
+                </div>
               </div>
-            </div>
-          </td>
-          <td>
-            <div style="font-weight:600;font-size:13px">{{ c.contactPerson }}</div>
-            <div style="font-size:12px;color:var(--text-muted)"><mat-icon style="font-size:14px;vertical-align:middle">location_on</mat-icon> {{ c.billingAddress | slice:0:30 }}{{c.billingAddress.length>30?'...':''}}</div>
-          </td>
-          <td>
-            <div style="font-size:13px">{{ c.email }}</div>
-            <div style="font-size:12px;color:var(--text-muted)">{{ c.mobile }}</div>
-          </td>
-          <td>
-            <div style="font-size:13px;font-weight:500">{{ c.paymentTerms }}</div>
-            <div style="font-size:12px;color:var(--text-muted)">{{ c.creditDays }} days credit</div>
-          </td>
-          <td>
-            <span class="badge" [class.badge-success]="c.status==='Active'" [class.badge-danger]="c.status!=='Active'">{{ c.status }}</span>
-          </td>
-          <td>
-            <div style="display:flex;gap:4px">
-              <button mat-icon-button (click)="openForm(c)" matTooltip="Edit Client"><mat-icon style="font-size:18px">edit</mat-icon></button>
-              <button mat-icon-button color="warn" (click)="deleteClient(c)" matTooltip="Delete Client"><mat-icon style="font-size:18px">delete</mat-icon></button>
-            </div>
-          </td>
-        </tr>
+            </td>
+            <td>
+              <div style="font-weight:600;font-size:13px">{{ c.contactPerson }}</div>
+              <div style="font-size:12px;color:var(--text-muted)"><mat-icon style="font-size:14px;vertical-align:middle">location_on</mat-icon> {{ c.billingAddress | slice:0:30 }}{{c.billingAddress.length>30?'...':''}}</div>
+            </td>
+            <td>
+              <div style="font-size:13px">{{ c.email }}</div>
+              <div style="font-size:12px;color:var(--text-muted)">{{ c.mobile }}</div>
+            </td>
+            <td>
+              <div style="font-size:13px;font-weight:500">{{ c.paymentTerms }}</div>
+              <div style="font-size:12px;color:var(--text-muted)">{{ c.creditDays }} days credit</div>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="c.status==='Active'" [class.badge-danger]="c.status!=='Active'">{{ c.status }}</span>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px">
+                <button mat-icon-button (click)="openForm(c)" matTooltip="Edit Client"><mat-icon style="font-size:18px">edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteClient(c)" matTooltip="Delete Client"><mat-icon style="font-size:18px">delete</mat-icon></button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:60px;color:var(--text-muted)">
-      <mat-icon style="font-size:56px;width:56px;height:56px;opacity:0.3;margin-bottom:12px">business</mat-icon>
-      <p>No clients found</p>
-    </div>
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:60px;color:var(--text-muted)">
+        <mat-icon style="font-size:56px;width:56px;height:56px;opacity:0.3;margin-bottom:12px">business</mat-icon>
+        <p>No clients found</p>
+      </div>
+    }
   </div>
 
   <!-- Inline Dialog -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
-    <div class="inline-dialog" (click)="$event.stopPropagation()">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Client' : 'Add Client' }}</h3>
-        <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
-      </div>
-      <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
-        <div class="form-grid2">
-          <mat-form-field appearance="outline"><mat-label>Company Name</mat-label><input matInput formControlName="companyName"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Contact Person</mat-label><input matInput formControlName="contactPerson"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Mobile</mat-label><input matInput formControlName="mobile"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>GST Number</mat-label><input matInput formControlName="gstNumber"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Payment Terms</mat-label><input matInput formControlName="paymentTerms" placeholder="Net 30"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Credit Days</mat-label><input matInput type="number" formControlName="creditDays"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Status</mat-label>
+  @if (showForm) {
+    <div class="dialog-overlay" (click)="showForm=false">
+      <div class="inline-dialog" (click)="$event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <h3 style="font-size:18px;font-weight:700;margin:0">{{ editing?.id ? 'Edit Client' : 'Add Client' }}</h3>
+          <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" style="padding:20px 24px">
+          <div class="form-grid2">
+            <mat-form-field appearance="outline"><mat-label>Company Name</mat-label><input matInput formControlName="companyName"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Contact Person</mat-label><input matInput formControlName="contactPerson"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Mobile</mat-label><input matInput formControlName="mobile"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>GST Number</mat-label><input matInput formControlName="gstNumber"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Payment Terms</mat-label><input matInput formControlName="paymentTerms" placeholder="Net 30"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Credit Days</mat-label><input matInput type="number" formControlName="creditDays"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Status</mat-label>
             <mat-select formControlName="status"><mat-option value="Active">Active</mat-option><mat-option value="Inactive">Inactive</mat-option></mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline" style="grid-column:1/-1"><mat-label>Billing Address</mat-label><textarea matInput formControlName="billingAddress" rows="2"></textarea></mat-form-field>
@@ -106,25 +113,28 @@ import { Client } from '../../core/models';
         </div>
       </form>
     </div>
-  <!-- Delete Confirmation Dialog -->
-  <div class="dialog-overlay" *ngIf="deletingClient" (click)="deletingClient=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
-      <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-        <mat-icon style="font-size:32px;width:32px;height:32px">business</mat-icon>
+    <!-- Delete Confirmation Dialog -->
+    @if (deletingClient) {
+      <div class="dialog-overlay" (click)="deletingClient=null">
+        <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
+          <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+            <mat-icon style="font-size:32px;width:32px;height:32px">business</mat-icon>
+          </div>
+          <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Client?</h3>
+          <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
+            Are you sure you want to permanently delete <strong>{{ deletingClient.companyName }}</strong>?<br>
+            All related requirements may be affected.
+          </p>
+          <div style="display:flex;gap:12px;justify-content:center">
+            <button mat-stroked-button (click)="deletingClient=null">Cancel</button>
+            <button mat-raised-button color="warn" (click)="confirmDelete()">Delete Client</button>
+          </div>
+        </div>
       </div>
-      <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Client?</h3>
-      <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
-        Are you sure you want to permanently delete <strong>{{ deletingClient.companyName }}</strong>?<br>
-        All related requirements may be affected.
-      </p>
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button mat-stroked-button (click)="deletingClient=null">Cancel</button>
-        <button mat-raised-button color="warn" (click)="confirmDelete()">Delete Client</button>
-      </div>
-    </div>
+    }
   </div>
-</div>
-  `,
+}
+`,
     styles: [`
     .c-table { width:100%; border-collapse:collapse;
       th { padding:14px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:rgba(108,99,255,0.04); }

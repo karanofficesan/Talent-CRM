@@ -27,9 +27,11 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
   </div>
 
   <div class="status-tabs" style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
-    <button *ngFor="let s of statuses" class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-full);padding:8px 16px;color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;font-family:inherit">
-      {{ s }} <span style="background:rgba(255,255,255,0.1);border-radius:var(--radius-full);padding:1px 7px;font-size:11px">{{ countByStatus(s) }}</span>
-    </button>
+    @for (s of statuses; track s) {
+      <button class="tab-btn" [class.active]="filterStatus===s" (click)="filterStatus=s;applyFilter()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-full);padding:8px 16px;color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;font-family:inherit">
+        {{ s }} <span style="background:rgba(255,255,255,0.1);border-radius:var(--radius-full);padding:1px 7px;font-size:11px">{{ countByStatus(s) }}</span>
+      </button>
+    }
   </div>
 
   <div class="data-table-wrapper">
@@ -40,116 +42,142 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
         <th>Financials</th><th>Status</th><th>Actions</th>
       </tr></thead>
       <tbody>
-        <tr *ngFor="let q of filtered; let i = index">
-          <td style="text-align:center;font-weight:600;color:var(--text-muted)">{{ i + 1 }}</td>
-          <td>
-            <div style="font-weight:700;font-size:14px;color:var(--color-primary)">{{ q.quotationNumber }}</div>
-            <div style="font-weight:600;font-size:13px">{{ q.projectName }}</div>
-            <div style="font-size:11px;color:var(--text-muted)">Valid until {{ q.validUntil }}</div>
-          </td>
-          <td>
-            <div style="font-weight:500;font-size:13px"><mat-icon style="font-size:13px;vertical-align:middle;color:var(--text-muted)">business</mat-icon> {{ q.clientName }}</div>
-          </td>
-          <td>
-            <div class="model-avatars">
-              <img *ngFor="let m of q.models.slice(0,3)" [src]="m.coverImage" class="model-thumb" [title]="m.modelName">
-              <span *ngIf="q.models.length>3" class="model-more">+{{ q.models.length-3 }}</span>
-            </div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">{{ q.models.length }} model(s)</div>
-          </td>
-          <td>
-            <div style="font-size:13px"><span style="color:var(--text-muted)">Price:</span> <span style="font-weight:700">₹{{ q.totalSellingPrice.toLocaleString() }}</span></div>
-            <div style="font-size:13px"><span style="color:var(--text-muted)">Profit:</span> <span style="font-weight:700;color:var(--color-success)">₹{{ q.grossProfit.toLocaleString() }}</span></div>
-          </td>
-          <td>
-            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
-              <span class="badge" [ngClass]="statusColor(q.status)">{{ q.status }}</span>
-              <span class="badge badge-success" *ngIf="q.modelAgreementSigned" style="font-size:10px;padding:2px 6px;display:flex;align-items:center;gap:2px"><mat-icon style="font-size:10px;width:10px;height:10px">check</mat-icon> Agreement</span>
-            </div>
-          </td>
-          <td>
-            <div style="display:flex;gap:4px;flex-wrap:wrap">
-              <button mat-icon-button (click)="viewQuotation(q)" matTooltip="View Details"><mat-icon style="font-size:18px">visibility</mat-icon></button>
-              
-              <button mat-icon-button [matMenuTriggerFor]="actionMenu" matTooltip="More Actions"><mat-icon style="font-size:18px">more_vert</mat-icon></button>
-              <mat-menu #actionMenu="matMenu">
-                <button mat-menu-item (click)="changeStatus(q,'Sent')" *ngIf="q.status==='Draft'"><mat-icon>send</mat-icon> Send Quotation</button>
-                <button mat-menu-item (click)="changeStatus(q,'Approved')" *ngIf="q.status==='Sent'"><mat-icon color="primary">thumb_up</mat-icon> Approve</button>
-                <button mat-menu-item (click)="changeStatus(q,'Not Approved')" *ngIf="q.status==='Sent'"><mat-icon color="warn">thumb_down</mat-icon> Reject</button>
-                <button mat-menu-item (click)="convertToBooking(q)" *ngIf="q.status==='Approved'"><mat-icon>event_available</mat-icon> Convert to Booking</button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="deleteQuotation(q)"><mat-icon color="warn">delete</mat-icon> Delete</button>
-              </mat-menu>
-            </div>
-          </td>
-        </tr>
+        @for (q of filtered; track q; let i = $index) {
+          <tr>
+            <td style="text-align:center;font-weight:600;color:var(--text-muted)">{{ i + 1 }}</td>
+            <td>
+              <div style="font-weight:700;font-size:14px;color:var(--color-primary)">{{ q.quotationNumber }}</div>
+              <div style="font-weight:600;font-size:13px">{{ q.projectName }}</div>
+              <div style="font-size:11px;color:var(--text-muted)">Valid until {{ q.validUntil }}</div>
+            </td>
+            <td>
+              <div style="font-weight:500;font-size:13px"><mat-icon style="font-size:13px;vertical-align:middle;color:var(--text-muted)">business</mat-icon> {{ q.clientName }}</div>
+            </td>
+            <td>
+              <div class="model-avatars">
+                @for (m of q.models.slice(0,3); track m) {
+                  <img [src]="m.coverImage" class="model-thumb" [title]="m.modelName">
+                }
+                @if (q.models.length>3) {
+                  <span class="model-more">+{{ q.models.length-3 }}</span>
+                }
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">{{ q.models.length }} model(s)</div>
+            </td>
+            <td>
+              <div style="font-size:13px"><span style="color:var(--text-muted)">Price:</span> <span style="font-weight:700">₹{{ q.totalSellingPrice.toLocaleString() }}</span></div>
+              <div style="font-size:13px"><span style="color:var(--text-muted)">Profit:</span> <span style="font-weight:700;color:var(--color-success)">₹{{ q.grossProfit.toLocaleString() }}</span></div>
+            </td>
+            <td>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
+                <span class="badge" [ngClass]="statusColor(q.status)">{{ q.status }}</span>
+                @if (q.modelAgreementSigned) {
+                  <span class="badge badge-success" style="font-size:10px;padding:2px 6px;display:flex;align-items:center;gap:2px"><mat-icon style="font-size:10px;width:10px;height:10px">check</mat-icon> Agreement</span>
+                }
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">
+                <button mat-icon-button (click)="viewQuotation(q)" matTooltip="View Details"><mat-icon style="font-size:18px">visibility</mat-icon></button>
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu" matTooltip="More Actions"><mat-icon style="font-size:18px">more_vert</mat-icon></button>
+                <mat-menu #actionMenu="matMenu">
+                  @if (q.status==='Draft') {
+                    <button mat-menu-item (click)="changeStatus(q,'Sent')"><mat-icon>send</mat-icon> Send Quotation</button>
+                  }
+                  @if (q.status==='Sent') {
+                    <button mat-menu-item (click)="changeStatus(q,'Approved')"><mat-icon color="primary">thumb_up</mat-icon> Approve</button>
+                  }
+                  @if (q.status==='Sent') {
+                    <button mat-menu-item (click)="changeStatus(q,'Not Approved')"><mat-icon color="warn">thumb_down</mat-icon> Reject</button>
+                  }
+                  @if (q.status==='Approved') {
+                    <button mat-menu-item (click)="convertToBooking(q)"><mat-icon>event_available</mat-icon> Convert to Booking</button>
+                  }
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item (click)="deleteQuotation(q)"><mat-icon color="warn">delete</mat-icon> Delete</button>
+                </mat-menu>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
-    
-    <div *ngIf="filtered.length===0" style="text-align:center;padding:60px;color:var(--text-muted)">
-      <mat-icon style="font-size:56px;width:56px;height:56px;opacity:0.3;margin-bottom:12px">request_quote</mat-icon>
-      <p>No quotations found</p>
-    </div>
+
+    @if (filtered.length===0) {
+      <div style="text-align:center;padding:60px;color:var(--text-muted)">
+        <mat-icon style="font-size:56px;width:56px;height:56px;opacity:0.3;margin-bottom:12px">request_quote</mat-icon>
+        <p>No quotations found</p>
+      </div>
+    }
   </div>
 
   <!-- View Modal -->
-  <div class="dialog-overlay" *ngIf="viewingQ" (click)="viewingQ=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:700px;max-height:90vh;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
-        <div>
-          <h3 style="margin:0;font-weight:700">{{ viewingQ.quotationNumber }}</h3>
-          <div style="font-size:12px;color:var(--text-muted)">{{ viewingQ.projectName }} · {{ viewingQ.clientName }}</div>
+  @if (viewingQ) {
+    <div class="dialog-overlay" (click)="viewingQ=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:700px;max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
+          <div>
+            <h3 style="margin:0;font-weight:700">{{ viewingQ.quotationNumber }}</h3>
+            <div style="font-size:12px;color:var(--text-muted)">{{ viewingQ.projectName }} · {{ viewingQ.clientName }}</div>
+          </div>
+          <button mat-icon-button (click)="viewingQ=null"><mat-icon>close</mat-icon></button>
         </div>
-        <button mat-icon-button (click)="viewingQ=null"><mat-icon>close</mat-icon></button>
-      </div>
-      <div style="padding:20px 24px">
-        <h4 style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px">Selected Models (Client View)</h4>
-        <div class="qmodel-list">
-          <div class="qmodel-item" *ngFor="let m of viewingQ.models">
-            <img [src]="m.coverImage" class="qmodel-img">
-            <div class="qmodel-info">
-              <div style="font-weight:700;font-size:14px">{{ m.modelName }}</div>
-              <div style="font-size:12px;color:var(--text-muted)">{{ m.height }}cm · {{ m.age }}y · {{ m.experience }}y exp</div>
-              <div style="font-size:12px;margin-top:4px">
-                <span class="badge badge-primary" *ngFor="let c of m.categories">{{ c }}</span>
+        <div style="padding:20px 24px">
+          <h4 style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px">Selected Models (Client View)</h4>
+          <div class="qmodel-list">
+            @for (m of viewingQ.models; track m) {
+              <div class="qmodel-item">
+                <img [src]="m.coverImage" class="qmodel-img">
+                <div class="qmodel-info">
+                  <div style="font-weight:700;font-size:14px">{{ m.modelName }}</div>
+                  <div style="font-size:12px;color:var(--text-muted)">{{ m.height }}cm · {{ m.age }}y · {{ m.experience }}y exp</div>
+                  <div style="font-size:12px;margin-top:4px">
+                    @for (c of m.categories; track c) {
+                      <span class="badge badge-primary">{{ c }}</span>
+                    }
+                  </div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-weight:700;font-size:15px;color:var(--color-success)">₹{{ m.sellingPrice.toLocaleString() }}</div>
+                  <div style="font-size:10px;color:var(--text-muted)">Selling Price</div>
+                </div>
               </div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:700;font-size:15px;color:var(--color-success)">₹{{ m.sellingPrice.toLocaleString() }}</div>
-              <div style="font-size:10px;color:var(--text-muted)">Selling Price</div>
-            </div>
+            }
+          </div>
+          <div class="q-summary">
+            <div class="sum-row"><span>Total Amount</span><span style="font-weight:800;font-size:18px;color:var(--color-primary)">₹{{ viewingQ.totalSellingPrice.toLocaleString() }}</span></div>
+            <div class="sum-row" style="margin-top:8px"><span>Terms & Conditions</span></div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:6px;padding:10px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm)">{{ viewingQ.termsAndConditions }}</div>
           </div>
         </div>
-        <div class="q-summary">
-          <div class="sum-row"><span>Total Amount</span><span style="font-weight:800;font-size:18px;color:var(--color-primary)">₹{{ viewingQ.totalSellingPrice.toLocaleString() }}</span></div>
-          <div class="sum-row" style="margin-top:8px"><span>Terms & Conditions</span></div>
-          <div style="font-size:13px;color:var(--text-muted);margin-top:6px;padding:10px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm)">{{ viewingQ.termsAndConditions }}</div>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Dialog -->
+  @if (deletingQ) {
+    <div class="dialog-overlay" (click)="deletingQ=null">
+      <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
+        <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <mat-icon style="font-size:32px;width:32px;height:32px">request_quote</mat-icon>
+        </div>
+        <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Quotation?</h3>
+        <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
+          Are you sure you want to permanently delete quotation <strong>{{ deletingQ.quotationNumber }}</strong>?<br>
+          This action cannot be undone.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button mat-stroked-button (click)="deletingQ=null">Cancel</button>
+          <button mat-raised-button color="warn" (click)="confirmDelete()">Delete</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Delete Confirmation Dialog -->
-  <div class="dialog-overlay" *ngIf="deletingQ" (click)="deletingQ=null">
-    <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:400px;text-align:center;padding:32px 24px">
-      <div style="width:64px;height:64px;background:rgba(255,83,112,0.1);color:var(--color-danger);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-        <mat-icon style="font-size:32px;width:32px;height:32px">request_quote</mat-icon>
-      </div>
-      <h3 style="font-size:20px;font-weight:700;margin:0 0 8px">Delete Quotation?</h3>
-      <p style="color:var(--text-muted);font-size:14px;margin:0 0 24px">
-        Are you sure you want to permanently delete quotation <strong>{{ deletingQ.quotationNumber }}</strong>?<br>
-        This action cannot be undone.
-      </p>
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button mat-stroked-button (click)="deletingQ=null">Cancel</button>
-        <button mat-raised-button color="warn" (click)="confirmDelete()">Delete</button>
-      </div>
-    </div>
-  </div>
+  }
 </div>
 
-  <!-- Create Quotation Form Dialog -->
-  <div class="dialog-overlay" *ngIf="showForm" (click)="showForm=false">
+<!-- Create Quotation Form Dialog -->
+@if (showForm) {
+  <div class="dialog-overlay" (click)="showForm=false">
     <div class="inline-dialog" (click)="$event.stopPropagation()" style="width:700px;max-height:90vh;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)">
         <div>
@@ -158,13 +186,10 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
         </div>
         <button mat-icon-button (click)="showForm=false"><mat-icon>close</mat-icon></button>
       </div>
-
       <form [formGroup]="form" (ngSubmit)="saveQuotation()" style="padding:20px 24px">
-
         <!-- Section: Client Info -->
         <div class="form-section-title">Client & Project Details</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px">
-
           <!-- Client: Dropdown or Custom -->
           <div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -175,20 +200,25 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
               </label>
             </div>
             <!-- Dropdown -->
-            <mat-form-field appearance="outline" style="width:100%" *ngIf="!isCustomClient">
-              <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
-                <mat-option value="">-- Select Client --</mat-option>
-                <mat-option *ngFor="let c of clients" [value]="c.id">{{ c.companyName }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            @if (!isCustomClient) {
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
+                  <mat-option value="">-- Select Client --</mat-option>
+                  @for (c of clients; track c) {
+                    <mat-option [value]="c.id">{{ c.companyName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
             <!-- Manual input -->
-            <mat-form-field appearance="outline" style="width:100%" *ngIf="isCustomClient">
-              <mat-label>Client Name</mat-label>
-              <input matInput formControlName="customClientName" placeholder="e.g. XYZ Fashion Pvt Ltd">
-              <mat-icon matSuffix>business</mat-icon>
-            </mat-form-field>
+            @if (isCustomClient) {
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Client Name</mat-label>
+                <input matInput formControlName="customClientName" placeholder="e.g. XYZ Fashion Pvt Ltd">
+                <mat-icon matSuffix>business</mat-icon>
+              </mat-form-field>
+            }
           </div>
-
           <div>
             <label class="field-label">Project Name *</label>
             <mat-form-field appearance="outline" style="width:100%">
@@ -196,7 +226,6 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
               <mat-icon matSuffix>movie</mat-icon>
             </mat-form-field>
           </div>
-
           <div>
             <label class="field-label">Valid Until *</label>
             <mat-form-field appearance="outline" style="width:100%">
@@ -204,7 +233,6 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
               <mat-icon matSuffix>event</mat-icon>
             </mat-form-field>
           </div>
-
           <div>
             <label class="field-label">Shoot Location</label>
             <mat-form-field appearance="outline" style="width:100%">
@@ -213,27 +241,31 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
             </mat-form-field>
           </div>
         </div>
-
         <!-- Section: Models -->
         <div class="form-section-title" style="margin-top:8px">
           Select Models
           <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:8px">{{ selectedModelIds.length }} selected</span>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:200px;overflow-y:auto;padding:4px 2px;margin-bottom:16px">
-          <div *ngFor="let m of models"
-            (click)="toggleModel(m)"
-            [class.model-sel-active]="isSelected(m.id)"
-            class="model-sel-card">
-            <img [src]="m.coverImage || 'https://ui-avatars.com/api/?name='+m.fullName+'&background=6c63ff&color=fff&size=80'" class="model-sel-img">
-            <div style="font-size:11px;font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.fullName }}</div>
-            <div style="font-size:10px;color:var(--text-muted)">₹{{ (m.modelCharges || 0).toLocaleString() }}/day</div>
-            <mat-icon *ngIf="isSelected(m.id)" class="sel-check">check_circle</mat-icon>
-          </div>
-          <div *ngIf="models.length===0" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);font-size:13px">
-            <mat-icon>person_off</mat-icon><p>No active models found</p>
-          </div>
+          @for (m of models; track m) {
+            <div
+              (click)="toggleModel(m)"
+              [class.model-sel-active]="isSelected(m.id)"
+              class="model-sel-card">
+              <img [src]="m.coverImage || 'https://ui-avatars.com/api/?name='+m.fullName+'&background=6c63ff&color=fff&size=80'" class="model-sel-img">
+              <div style="font-size:11px;font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.fullName }}</div>
+              <div style="font-size:10px;color:var(--text-muted)">₹{{ (m.modelCharges || 0).toLocaleString() }}/day</div>
+              @if (isSelected(m.id)) {
+                <mat-icon class="sel-check">check_circle</mat-icon>
+              }
+            </div>
+          }
+          @if (models.length===0) {
+            <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);font-size:13px">
+              <mat-icon>person_off</mat-icon><p>No active models found</p>
+            </div>
+          }
         </div>
-
         <!-- Financial Summary Bar -->
         <div style="background:linear-gradient(135deg,rgba(108,99,255,0.08),rgba(0,212,170,0.05));border:1px solid rgba(108,99,255,0.2);border-radius:var(--radius-md);padding:14px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
           <div style="text-align:center">
@@ -253,7 +285,6 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
             <div style="font-size:16px;font-weight:700;color:var(--color-success)">₹{{ (totalSelling - totalCost).toLocaleString() }}</div>
           </div>
         </div>
-
         <!-- Terms & Notes -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
@@ -269,7 +300,6 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
             </mat-form-field>
           </div>
         </div>
-
         <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:4px;padding-top:16px;border-top:1px solid var(--border)">
           <button mat-stroked-button type="button" (click)="showForm=false">Cancel</button>
           <button mat-raised-button color="primary" type="submit"
@@ -280,7 +310,8 @@ const Q_STATUS_COLOR: Record<string,string> = { 'Draft':'badge-muted','Sent':'ba
       </form>
     </div>
   </div>
-  `,
+}
+`,
     styles: [`
     .tab-btn.active { background:rgba(108,99,255,0.2)!important; border-color:var(--color-primary)!important; color:var(--color-primary)!important; }
     .q-table { width:100%; border-collapse:collapse;
